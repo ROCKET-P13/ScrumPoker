@@ -1,12 +1,12 @@
-# Dependency directories
-node_modules/
+# Build Results
+bin
+obj
+out
 
-# dotenv environment variable files
-.env
-.env.*
-!.env.example
+# ASP.NET Core secrets
+appsettings.json
+appsettings.Development.json
 
-# Vite files
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
-.vite/
+# Entity Framework
+Migrations/*.Designer.cs
+Migrations/*.csproj
