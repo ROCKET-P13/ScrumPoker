@@ -17,9 +17,10 @@ var roomService = new RoomService();
 var shutdownCts = new CancellationTokenSource();
 
 var webSocketClient = new LocalWebSocketClient(sockets);
-var joinHandler = new JoinRoomHandler(webSocketClient, roomService);
-var voteHandler = new VoteHandler(webSocketClient, roomService);
-var dispatcher = new HandlerRegistry(joinHandler, voteHandler);
+var gameHub = new GameHub(roomService, webSocketClient);
+var joinHandler = new JoinRoomHandler(roomService);
+var voteHandler = new VoteHandler(roomService);
+var dispatcher = new HandlerRegistry(joinHandler, voteHandler, gameHub);
 
 app.Lifetime.ApplicationStopping.Register(() =>
 {
