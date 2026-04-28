@@ -1,12 +1,13 @@
+using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using ScrumPokerAPI.Core.Interfaces;
 
 namespace ScrumPokerAPI.Local;
 
-public class LocalWebSocketClient(Dictionary<string, WebSocket> sockets) : IWebSocketClient
+public class LocalWebSocketClient(ConcurrentDictionary<string, WebSocket> sockets) : IWebSocketClient
 {
-    private readonly Dictionary<string, WebSocket> _sockets = sockets;
+    private readonly ConcurrentDictionary<string, WebSocket> _sockets = sockets;
 
 	public async Task SendMessageAsync(string connectionId, string message)
     {

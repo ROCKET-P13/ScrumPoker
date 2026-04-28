@@ -15,9 +15,10 @@ public class Function
     {
         var endpoint = Environment.GetEnvironmentVariable("WEBSOCKET_ENDPOINT");
 
-        var wsClient = new LambdaWebSocketClient(endpoint!);
+        var webSocketClient = new LambdaWebSocketClient(endpoint!);
+		var roomService = new RoomService();
 
-        _dispatcher = new MessageDispatcher(wsClient);
+        _dispatcher = new MessageDispatcher(webSocketClient, roomService);
     }
 
     public async Task<APIGatewayProxyResponse> FunctionHandler(

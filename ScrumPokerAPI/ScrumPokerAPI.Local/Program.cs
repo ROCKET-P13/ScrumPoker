@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using ScrumPokerAPI.Core.Models;
@@ -7,23 +8,70 @@ using ScrumPokerAPI.Local;
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
-var sockets = new Dictionary<string, WebSocket>();
-
 app.UseWebSockets();
+
+var sockets = new ConcurrentDictionary<string, WebSocket>();
+
+var roomService = new RoomService();
+var shutdownCts = new CancellationTokenSource();
+
+app.Lifetime.ApplicationStopping.Register(() =>
+{
+    Console.WriteLine("Closing all sockets...");
+
+    shutdownCts.Cancel();
+
+    foreach (var socket in sockets.Values)
+    {
+        try
+        {
+            if (socket.State == WebSocketState.Open ||
+                socket.State == WebSocketState.CloseReceived)
+            {
+                socket.CloseAsync(
+                    WebSocketCloseStatus.NormalClosure,
+                    "Server shutting down",
+                    CancellationToken.None
+                ).GetAwaiter().GetResult();
+            }
+
+            socket.Dispose();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Socket close error: {ex.Message}");
+        }
+    }
+
+    sockets.Clear();
+});
 
 app.Map("/ws", async context =>
 {
+    if (!context.WebSockets.IsWebSocketRequest)
+    {
+        context.Response.StatusCode = 400;
+        return;
+    }
+
     var socket = await context.WebSockets.AcceptWebSocketAsync();
     var connectionId = Guid.NewGuid().ToString();
 
     sockets[connectionId] = socket;
 
-    var wsClient = new LocalWebSocketClient(sockets);
-    var dispatcher = new MessageDispatcher(wsClient);
+    var webSocketClient = new LocalWebSocketClient(sockets);
+    var dispatcher = new MessageDispatcher(webSocketClient, roomService);
 
-    var buffer = new byte[4096]; // increased buffer size (important for JSON)
+    var buffer = new byte[4096];
 
-    var ct = context.RequestAborted;
+    using var shutdownContext = new CancellationTokenSource();
+
+	using var linkedContext = CancellationTokenSource.CreateLinkedTokenSource(
+		context.RequestAborted,
+		shutdownContext.Token
+	);
+
+	var ct = linkedContext.Token;
 
     try
     {
@@ -49,27 +97,27 @@ app.Map("/ws", async context =>
     }
     catch (OperationCanceledException)
     {
-        // triggered when server shuts down
+        // expected during shutdown
+    }
+    catch (WebSocketException)
+    {
+        // client disconnects
     }
     finally
     {
-        sockets.Remove(connectionId);
+        sockets.TryRemove(connectionId, out _);
 
-        if (socket.State == WebSocketState.Open ||
-            socket.State == WebSocketState.CloseReceived)
+        try
         {
-            try
+            if (socket.State == WebSocketState.Open)
             {
                 await socket.CloseAsync(
                     WebSocketCloseStatus.NormalClosure,
-                    "Server shutting down",
+                    "Closing",
                     CancellationToken.None);
             }
-            catch
-            {
-                // ignore shutdown race conditions
-            }
         }
+        catch { }
 
         socket.Dispose();
     }
