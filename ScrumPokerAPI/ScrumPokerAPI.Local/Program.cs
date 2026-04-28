@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
+using ScrumPokerAPI.Core.Handlers;
 using ScrumPokerAPI.Core.Models;
 using ScrumPokerAPI.Core.Services;
 using ScrumPokerAPI.Local;
@@ -14,6 +15,8 @@ var sockets = new ConcurrentDictionary<string, WebSocket>();
 
 var roomService = new RoomService();
 var shutdownCts = new CancellationTokenSource();
+var webSocketClient = new LocalWebSocketClient(sockets);
+var joinHandler = new JoinRoomHandler(webSocketClient, roomService);
 
 app.Lifetime.ApplicationStopping.Register(() =>
 {
@@ -59,8 +62,8 @@ app.Map("/ws", async context =>
 
     sockets[connectionId] = socket;
 
-    var webSocketClient = new LocalWebSocketClient(sockets);
-    var dispatcher = new MessageDispatcher(webSocketClient, roomService);
+
+    var dispatcher = new HandlerRegistry(joinHandler);
 
     var buffer = new byte[4096];
 

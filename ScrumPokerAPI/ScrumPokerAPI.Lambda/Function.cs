@@ -1,5 +1,6 @@
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using ScrumPokerAPI.Core.Handlers;
 using ScrumPokerAPI.Core.Models;
 using ScrumPokerAPI.Core.Services;
 
@@ -9,7 +10,7 @@ namespace ScrumPokerAPI.Lambda;
 
 public class Function
 {
-    private readonly MessageDispatcher _dispatcher;
+    private readonly HandlerRegistry _dispatcher;
 
     public Function()
     {
@@ -17,8 +18,9 @@ public class Function
 
         var webSocketClient = new LambdaWebSocketClient(endpoint!);
 		var roomService = new RoomService();
+		var joinHandler = new JoinRoomHandler(webSocketClient, roomService);
 
-        _dispatcher = new MessageDispatcher(webSocketClient, roomService);
+        _dispatcher = new HandlerRegistry(joinHandler);
     }
 
     public async Task<APIGatewayProxyResponse> FunctionHandler(
