@@ -56,11 +56,11 @@ export class ScrumPokerInfrastructureStack extends cdk.Stack {
 			removalPolicy: cdk.RemovalPolicy.DESTROY,
 		});
 
-		const apiLambda = new lambda.Function(this, 'ApiLambda', {
+		const apiLambda = new lambda.Function(this, 'ScrumPokerLambda', {
 			runtime: lambda.Runtime.DOTNET_8,
-			handler: 'ScrumPokerAPI::ScrumPokerAPI.LambdaEntryPoint::FunctionHandlerAsync',
+  			handler: "ScrumPokerAPI.Lambda::ScrumPokerAPI.Lambda.Function::FunctionHandler",
 			code: lambda.Code.fromAsset(
-				path.join(__dirname, '../../ScrumPokerAPI/bin/Release/net8.0/publish')
+				path.join(__dirname, '../../ScrumPokerAPI/ScrumPokerAPI.Lambda/bin/Release/net8.0/publish')
 			),
 			vpc,
 			timeout: cdk.Duration.seconds(30),
