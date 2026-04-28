@@ -7,7 +7,7 @@ namespace ScrumPokerAPI.Lambda;
 
 public class LambdaWebSocketClient(string endpoint) : IWebSocketClient
 {
-	private readonly IAmazonApiGatewayManagementApi _client = new AmazonApiGatewayManagementApiClient(
+	private readonly AmazonApiGatewayManagementApiClient _client = new(
 		new AmazonApiGatewayManagementApiConfig
 		{
 			ServiceURL = endpoint
