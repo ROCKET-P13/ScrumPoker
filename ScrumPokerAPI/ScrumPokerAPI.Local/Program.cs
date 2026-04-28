@@ -15,8 +15,10 @@ var sockets = new ConcurrentDictionary<string, WebSocket>();
 
 var roomService = new RoomService();
 var shutdownCts = new CancellationTokenSource();
+
 var webSocketClient = new LocalWebSocketClient(sockets);
 var joinHandler = new JoinRoomHandler(webSocketClient, roomService);
+var dispatcher = new HandlerRegistry(joinHandler);
 
 app.Lifetime.ApplicationStopping.Register(() =>
 {
@@ -62,19 +64,16 @@ app.Map("/ws", async context =>
 
     sockets[connectionId] = socket;
 
-
-    var dispatcher = new HandlerRegistry(joinHandler);
-
     var buffer = new byte[4096];
 
     using var shutdownContext = new CancellationTokenSource();
 
-	using var linkedContext = CancellationTokenSource.CreateLinkedTokenSource(
-		context.RequestAborted,
-		shutdownContext.Token
-	);
+    using var linkedContext = CancellationTokenSource.CreateLinkedTokenSource(
+        context.RequestAborted,
+        shutdownContext.Token
+    );
 
-	var ct = linkedContext.Token;
+    var ct = linkedContext.Token;
 
     try
     {
@@ -110,9 +109,26 @@ app.Map("/ws", async context =>
     {
         sockets.TryRemove(connectionId, out _);
 
+        var updatedRoom = roomService.RemovePlayer(connectionId);
+
+        if (updatedRoom != null)
+        {
+            var payload = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                type = "ROOM_STATE",
+                room = updatedRoom
+            });
+
+            foreach (var player in updatedRoom.Players)
+            {
+                await webSocketClient.SendMessageAsync(player.ConnectionId, payload);
+            }
+        }
+
         try
         {
-            if (socket.State == WebSocketState.Open)
+            if (socket.State == WebSocketState.Open ||
+                socket.State == WebSocketState.CloseReceived)
             {
                 await socket.CloseAsync(
                     WebSocketCloseStatus.NormalClosure,
