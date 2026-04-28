@@ -9,18 +9,15 @@ namespace ScrumPokerAPI.Lambda;
 
 public class Function
 {
-    private readonly MessageRouter _router;
+    private readonly MessageDispatcher _dispatcher;
 
     public Function()
     {
         var endpoint = Environment.GetEnvironmentVariable("WEBSOCKET_ENDPOINT");
 
-        if (string.IsNullOrEmpty(endpoint))
-            throw new Exception("WEBSOCKET_ENDPOINT is not set");
+        var wsClient = new LambdaWebSocketClient(endpoint!);
 
-        var wsClient = new LambdaWebSocketClient(endpoint);
-
-        _router = new MessageRouter(wsClient);
+        _dispatcher = new MessageDispatcher(wsClient);
     }
 
     public async Task<APIGatewayProxyResponse> FunctionHandler(
@@ -34,7 +31,7 @@ public class Function
             Body = request.Body
         };
 
-        await _router.Route(socketRequest);
+        await _dispatcher.Dispatch(socketRequest);
 
         return new APIGatewayProxyResponse
         {

@@ -19,9 +19,9 @@ app.Map("/ws", async context =>
     sockets[connectionId] = socket;
 
     var wsClient = new LocalWebSocketClient(sockets);
-    var router = new MessageRouter(wsClient);
+    var dispatcher = new MessageDispatcher(wsClient);
 
-    var buffer = new byte[1024];
+    var buffer = new byte[4096]; // increased buffer size (important for JSON)
 
     var ct = context.RequestAborted;
 
@@ -44,23 +44,31 @@ app.Map("/ws", async context =>
                 Body = message
             };
 
-            await router.Route(request);
+            await dispatcher.Dispatch(request);
         }
     }
     catch (OperationCanceledException)
     {
-        // graceful shutdown
+        // triggered when server shuts down
     }
     finally
     {
         sockets.Remove(connectionId);
 
-        if (socket.State == WebSocketState.Open)
+        if (socket.State == WebSocketState.Open ||
+            socket.State == WebSocketState.CloseReceived)
         {
-            await socket.CloseAsync(
-                WebSocketCloseStatus.NormalClosure,
-                "Server shutting down",
-                CancellationToken.None);
+            try
+            {
+                await socket.CloseAsync(
+                    WebSocketCloseStatus.NormalClosure,
+                    "Server shutting down",
+                    CancellationToken.None);
+            }
+            catch
+            {
+                // ignore shutdown race conditions
+            }
         }
 
         socket.Dispose();
