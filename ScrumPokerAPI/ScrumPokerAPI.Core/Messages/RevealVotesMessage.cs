@@ -1,7 +1,6 @@
 namespace ScrumPokerAPI.Core.Messages;
 
-public class SendVoteMessage : ClientMessage
+public class RevealVotesMessage : ClientMessage
 {
 	public string RoomId { get; set; } = default!;
-	public string Vote { get; set; } = default!;
 }

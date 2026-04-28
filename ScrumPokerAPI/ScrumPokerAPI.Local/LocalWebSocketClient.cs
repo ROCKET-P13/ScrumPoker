@@ -10,16 +10,27 @@ public class LocalWebSocketClient(ConcurrentDictionary<string, WebSocket> socket
     private readonly ConcurrentDictionary<string, WebSocket> _sockets = sockets;
 
 	public async Task SendMessageAsync(string connectionId, string message)
-    {
-        if (!_sockets.TryGetValue(connectionId, out var socket))
-            return;
+	{
+		if (_sockets.TryGetValue(connectionId, out var socket))
+		{
+			if (socket.State != WebSocketState.Open)
+				return;
 
-        var bytes = Encoding.UTF8.GetBytes(message);
+			try
+			{
+				var buffer = Encoding.UTF8.GetBytes(message);
 
-        await socket.SendAsync(
-            bytes,
-            WebSocketMessageType.Text,
-            true,
-            CancellationToken.None);
-    }
+				await socket.SendAsync(
+					buffer,
+					WebSocketMessageType.Text,
+					true,
+					CancellationToken.None
+				);
+			}
+			catch (WebSocketException)
+			{
+				// socket already closing/closed → ignore
+			}
+		}
+	}
 }

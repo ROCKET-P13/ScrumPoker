@@ -53,5 +53,37 @@ public class RoomService
 		return room;
 	}
 
+	public void SetVote(string roomId, string connectionId, string vote)
+	{
+		var room = GetOrCreateRoom(roomId);
+		room.Votes[connectionId] = vote;
+
+		var player = room.Players.FirstOrDefault(p => p.ConnectionId == connectionId);
+
+		if (player != null)
+		{
+			player.Vote = vote;
+		}
+	}
+
+	public void RevealVotes(string roomId)
+	{
+		var room = GetOrCreateRoom(roomId);
+		room.IsRevealed = true;
+	}
+
+	public void ResetRoom(string roomId)
+	{
+		var room = GetOrCreateRoom(roomId);
+
+		room.IsRevealed = false;
+		room.Votes.Clear();
+
+		foreach (var p in room.Players)
+		{
+			p.Vote = null;
+		}
+	}
+
 	public Room GetRoom(string roomId) => _rooms[roomId];
 }

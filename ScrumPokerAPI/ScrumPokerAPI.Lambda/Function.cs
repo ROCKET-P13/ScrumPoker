@@ -19,8 +19,9 @@ public class Function
         var webSocketClient = new LambdaWebSocketClient(endpoint!);
 		var roomService = new RoomService();
 		var joinHandler = new JoinRoomHandler(webSocketClient, roomService);
+		var voteHandler = new VoteHandler(webSocketClient, roomService);
 
-        _dispatcher = new HandlerRegistry(joinHandler);
+        _dispatcher = new HandlerRegistry(joinHandler, voteHandler);
     }
 
     public async Task<APIGatewayProxyResponse> FunctionHandler(

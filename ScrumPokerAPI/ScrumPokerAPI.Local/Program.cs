@@ -18,7 +18,8 @@ var shutdownCts = new CancellationTokenSource();
 
 var webSocketClient = new LocalWebSocketClient(sockets);
 var joinHandler = new JoinRoomHandler(webSocketClient, roomService);
-var dispatcher = new HandlerRegistry(joinHandler);
+var voteHandler = new VoteHandler(webSocketClient, roomService);
+var dispatcher = new HandlerRegistry(joinHandler, voteHandler);
 
 app.Lifetime.ApplicationStopping.Register(() =>
 {
@@ -26,26 +27,23 @@ app.Lifetime.ApplicationStopping.Register(() =>
 
     shutdownCts.Cancel();
 
-    foreach (var socket in sockets.Values)
+    foreach (var (id, socket) in sockets)
     {
-        try
-        {
-            if (socket.State == WebSocketState.Open ||
-                socket.State == WebSocketState.CloseReceived)
-            {
-                socket.CloseAsync(
-                    WebSocketCloseStatus.NormalClosure,
-                    "Server shutting down",
-                    CancellationToken.None
-                ).GetAwaiter().GetResult();
-            }
+		try
+		{
+			if (socket.State == WebSocketState.Open ||
+				socket.State == WebSocketState.CloseReceived)
+			{
+				socket.CloseAsync(
+					WebSocketCloseStatus.NormalClosure,
+					"Server shutting down",
+					CancellationToken.None
+				).GetAwaiter().GetResult();
+			}
 
-            socket.Dispose();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Socket close error: {ex.Message}");
-        }
+			socket.Dispose();
+		}
+		catch { }
     }
 
     sockets.Clear();
