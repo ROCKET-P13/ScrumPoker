@@ -24,15 +24,15 @@ public class HandlerRegistry(JoinRoomHandler joinRoomHandler, VoteHandler voteHa
 		switch (type)
 		{
 			case "JOIN_ROOM":
-				var join = JsonSerializer.Deserialize<JoinRoomMessage>(request.Body!, options);
-				_joinRoomHandler.Handle(join!, request);
-				await _gameHub.BroadcastRoom(join!.RoomId);
+				var joinRoomMessage = JsonSerializer.Deserialize<JoinRoomMessage>(request.Body!, options);
+				_joinRoomHandler.Handle(joinRoomMessage!, request);
+				await _gameHub.BroadcastRoom(joinRoomMessage!.RoomId);
 				break;
 
 			case "SEND_VOTE":
-				var vote = JsonSerializer.Deserialize<SendVoteMessage>(request.Body!, options);
-				_voteHandler.Send(vote!, request);
-				await _gameHub.BroadcastRoom(vote!.RoomId);
+				var sendVoteMessage = JsonSerializer.Deserialize<SendVoteMessage>(request.Body!, options);
+				_voteHandler.Send(sendVoteMessage!, request);
+				await _gameHub.BroadcastRoom(sendVoteMessage!.RoomId);
 				break;
 
 			case "REVEAL_VOTES":
