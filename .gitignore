@@ -1,0 +1,16 @@
+# .NET
+**/bin/
+**/obj/
+**/*.user
+**/*.suo
+**/.vs/
+
+# Node / CDK
+**/node_modules/
+**/cdk.out/
+**/*.tsbuildinfo
+
+# IDE
+.idea/
+*.swp
+.DS_Store

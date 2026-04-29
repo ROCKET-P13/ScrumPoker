@@ -1,0 +1,37 @@
+using ScrumPokerAPI.Domain.Entities;
+
+namespace ScrumPokerAPI.Domain.Repositories;
+
+public interface IRoomRepository
+{
+    Task<bool> IsRoomCodeAllocatedAsync(string code, CancellationToken cancellationToken);
+
+    /// <summary>Tracked aggregate for mutation (join, etc.).</summary>
+    Task<Room?> GetRoomByCodeForMutationAsync(string normalizedRoomCode, CancellationToken cancellationToken);
+
+    Task<Room?> GetRoomByIdForMutationAsync(Guid roomId, CancellationToken cancellationToken);
+
+    Task<bool> AnyParticipantInRoomAsync(Guid roomId, CancellationToken cancellationToken);
+
+    Task<Participant?> FindParticipantTrackedAsync(string connectionId, CancellationToken cancellationToken);
+
+    Task<Participant?> FindParticipantWithRoomForRevealAsync(string connectionId, CancellationToken cancellationToken);
+
+    Task<Participant?> FindParticipantWithRoomAggregateAsync(string connectionId, CancellationToken cancellationToken);
+
+    Task<Participant?> FindParticipantReadOnlyAsync(string connectionId, CancellationToken cancellationToken);
+
+    Task<Room?> GetRoomReadOnlyAsync(Guid roomId, CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<Participant>> ListParticipantsReadOnlyAsync(Guid roomId, CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<string>> GetConnectionIdsForRoomAsync(Guid roomId, CancellationToken cancellationToken);
+
+    void Add(Room room);
+
+    void Remove(Room room);
+
+    void Remove(Participant participant);
+
+    Task SaveChangesAsync(CancellationToken cancellationToken);
+}
