@@ -3,6 +3,7 @@ using System.Net.WebSockets;
 using System.Text;
 using ScrumPokerAPI.Core.Handlers;
 using ScrumPokerAPI.Core.Models;
+using ScrumPokerAPI.Core.Serialization;
 using ScrumPokerAPI.Core.Services;
 using ScrumPokerAPI.Local;
 
@@ -112,11 +113,7 @@ app.Map("/ws", async context =>
 
         if (updatedRoom != null)
         {
-            var payload = System.Text.Json.JsonSerializer.Serialize(new
-            {
-                type = "ROOM_STATE",
-                room = updatedRoom
-            });
+            var payload = RoomStatePayload.Serialize(updatedRoom);
 
             foreach (var player in updatedRoom.Players)
             {

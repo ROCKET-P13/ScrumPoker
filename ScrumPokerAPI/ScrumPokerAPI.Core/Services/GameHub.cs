@@ -1,26 +1,26 @@
-using System.Text.Json;
 using ScrumPokerAPI.Core.Interfaces;
+using ScrumPokerAPI.Core.Serialization;
 
 namespace ScrumPokerAPI.Core.Services;
 
 public class GameHub(RoomService roomService, IWebSocketClient webSocketClient)
 {
 	private readonly RoomService _roomService = roomService;
-    private readonly IWebSocketClient _webSocketClient = webSocketClient;
-	private readonly JsonSerializerOptions jsonSerializerOptions = new()
-	{
-		PropertyNameCaseInsensitive = true
-	};
+	private readonly IWebSocketClient _webSocketClient = webSocketClient;
 
 	public async Task BroadcastRoom(string roomId)
 	{
-		var room = _roomService.GetRoom(roomId);
+		if (string.IsNullOrWhiteSpace(roomId))
+		{
+			return;
+		}
 
-		var payload = JsonSerializer.Serialize(new
-			{
-				type = "ROOM_STATE",
-				room
-			}, jsonSerializerOptions);
+		if (!_roomService.TryGetRoom(roomId, out var room) || room is null)
+		{
+			return;
+		}
+
+		var payload = RoomStatePayload.Serialize(room);
 
 		foreach (var player in room.Players)
 		{
