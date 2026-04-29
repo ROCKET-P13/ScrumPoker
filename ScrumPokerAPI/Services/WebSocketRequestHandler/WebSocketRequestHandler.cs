@@ -36,19 +36,26 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         if (string.IsNullOrEmpty(connectionId))
             return EmptySuccessResponse();
 
-        var roomId = await _roomService.RemoveConnectionAsync(connectionId, cancellationToken).ConfigureAwait(false);
-        if (roomId == null)
+        try
+        {
+            var roomId = await _roomService.RemoveConnectionAsync(connectionId, cancellationToken).ConfigureAwait(false);
+            if (roomId == null)
+                return EmptySuccessResponse();
+
+            var targets = await _roomService.GetConnectionIdsForRoomAsync(roomId.Value, cancellationToken).ConfigureAwait(false);
+            if (targets.Count == 0)
+                return EmptySuccessResponse();
+
+            var state = await _roomService.GetRoomStateAsync(roomId.Value, cancellationToken).ConfigureAwait(false);
+            if (state != null)
+                await _broadcastService.BroadcastRoomStateAsync(request, targets, state, cancellationToken).ConfigureAwait(false);
+
             return EmptySuccessResponse();
-
-        var targets = await _roomService.GetConnectionIdsForRoomAsync(roomId.Value, cancellationToken).ConfigureAwait(false);
-        if (targets.Count == 0)
+        }
+        catch (OperationCanceledException)
+        {
             return EmptySuccessResponse();
-
-        var state = await _roomService.GetRoomStateAsync(roomId.Value, cancellationToken).ConfigureAwait(false);
-        if (state != null)
-            await _broadcastService.BroadcastRoomStateAsync(request, targets, state, cancellationToken).ConfigureAwait(false);
-
-        return EmptySuccessResponse();
+        }
     }
 
     private async Task<APIGatewayProxyResponse> HandleDefaultAsync(APIGatewayProxyRequest request, CancellationToken cancellationToken)
@@ -76,21 +83,21 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
             return EmptySuccessResponse();
         }
 
-        var action = clientMessage.Action.Trim().ToLowerInvariant();
+        var action = clientMessage.Action.Trim();
 
         try
         {
             switch (action)
             {
-                case "createroom":
+                case WebSocketRequestTypes.CreateRoom:
                     return await HandleCreateRoomAsync(request, connectionId, clientMessage, cancellationToken).ConfigureAwait(false);
-                case "joinroom":
+                case WebSocketRequestTypes.JoinRoom:
                     return await HandleJoinRoomAsync(request, connectionId, clientMessage, cancellationToken).ConfigureAwait(false);
-                case "vote":
+                case WebSocketRequestTypes.SendVote:
                     return await HandleVoteAsync(request, connectionId, clientMessage, cancellationToken).ConfigureAwait(false);
-                case "reveal":
+                case WebSocketRequestTypes.RevealVotes:
                     return await HandleRevealAsync(request, connectionId, cancellationToken).ConfigureAwait(false);
-                case "reset":
+                case WebSocketRequestTypes.ResetRound:
                     return await HandleResetAsync(request, connectionId, cancellationToken).ConfigureAwait(false);
                 default:
                     await SendErrorAsync(request, connectionId, $"Unknown action: {clientMessage.Action}.", cancellationToken)

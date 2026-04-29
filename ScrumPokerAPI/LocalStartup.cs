@@ -1,6 +1,7 @@
 using System.Net.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using ScrumPokerAPI.Data;
 using ScrumPokerAPI.Factories.ParticipantFactory;
 using ScrumPokerAPI.Factories.ParticipantFactory.Interfaces;
@@ -46,6 +47,10 @@ public static class LocalStartup
         builder.Services.AddScoped<IRoomService, RoomService>();
         builder.Services.AddSingleton<IBroadcastService, LocalBroadcastService>();
         builder.Services.AddScoped<WebSocketRequestHandler>();
+        builder.Services.Configure<HostOptions>(options =>
+        {
+            options.ShutdownTimeout = TimeSpan.FromSeconds(5);
+        });
     }
 
     public static void MapLocalWebSocket(WebApplication application, LocalWebSocketHub hub)
@@ -72,6 +77,12 @@ public static class LocalStartup
             }
 
             var scopeFactory = httpContext.RequestServices.GetRequiredService<IServiceScopeFactory>();
+            var lifetime = httpContext.RequestServices.GetRequiredService<IHostApplicationLifetime>();
+            using var shutdownLinked = CancellationTokenSource.CreateLinkedTokenSource(
+                httpContext.RequestAborted,
+                lifetime.ApplicationStopping);
+            var connectionLifetime = shutdownLinked.Token;
+
             var webSocket = await httpContext.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);
             var connectionId = Guid.NewGuid().ToString("N");
             hub.Register(connectionId, webSocket);
@@ -81,7 +92,7 @@ public static class LocalStartup
             await using (var scope = scopeFactory.CreateAsyncScope())
             {
                 var webSocketRequestHandler = scope.ServiceProvider.GetRequiredService<WebSocketRequestHandler>();
-                await webSocketRequestHandler.HandleAsync(connectEvent, httpContext.RequestAborted).ConfigureAwait(false);
+                await webSocketRequestHandler.HandleAsync(connectEvent, connectionLifetime).ConfigureAwait(false);
             }
 
             try
@@ -93,9 +104,16 @@ public static class LocalStartup
                     WebSocketReceiveResult receiveResult;
                     do
                     {
-                        receiveResult = await webSocket
-                            .ReceiveAsync(new ArraySegment<byte>(buffer), httpContext.RequestAborted)
-                            .ConfigureAwait(false);
+                        try
+                        {
+                            receiveResult = await webSocket
+                                .ReceiveAsync(new ArraySegment<byte>(buffer), connectionLifetime)
+                                .ConfigureAwait(false);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            return;
+                        }
 
                         if (receiveResult.MessageType == WebSocketMessageType.Close)
                             return;
@@ -114,7 +132,7 @@ public static class LocalStartup
                     await using (var scope = scopeFactory.CreateAsyncScope())
                     {
                         var webSocketRequestHandler = scope.ServiceProvider.GetRequiredService<WebSocketRequestHandler>();
-                        await webSocketRequestHandler.HandleAsync(messageEvent, httpContext.RequestAborted).ConfigureAwait(false);
+                        await webSocketRequestHandler.HandleAsync(messageEvent, connectionLifetime).ConfigureAwait(false);
                     }
                 }
             }
@@ -126,7 +144,7 @@ public static class LocalStartup
                 await using (var scope = scopeFactory.CreateAsyncScope())
                 {
                     var webSocketRequestHandler = scope.ServiceProvider.GetRequiredService<WebSocketRequestHandler>();
-                    await webSocketRequestHandler.HandleAsync(disconnectEvent, httpContext.RequestAborted).ConfigureAwait(false);
+                    await webSocketRequestHandler.HandleAsync(disconnectEvent, connectionLifetime).ConfigureAwait(false);
                 }
             }
         });
