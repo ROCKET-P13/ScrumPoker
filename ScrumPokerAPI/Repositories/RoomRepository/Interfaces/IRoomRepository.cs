@@ -6,7 +6,6 @@ public interface IRoomRepository
 {
     Task<bool> IsRoomCodeAllocatedAsync(string code, CancellationToken cancellationToken);
 
-    /// <summary>Tracked aggregate for mutation (join, etc.).</summary>
     Task<Room?> GetRoomByCodeForMutationAsync(string normalizedRoomCode, CancellationToken cancellationToken);
 
     Task<Room?> GetRoomByIdForMutationAsync(Guid roomId, CancellationToken cancellationToken);

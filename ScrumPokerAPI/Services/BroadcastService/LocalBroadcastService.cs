@@ -8,8 +8,9 @@ using ScrumPokerAPI.Services.WebSocketHub;
 
 namespace ScrumPokerAPI.Services.BroadcastService;
 
-public sealed class LocalBroadcastService(LocalWebSocketHub hub) : IBroadcastService
+public sealed class LocalBroadcastService(LocalWebSocketHub webSocketHub) : IBroadcastService
 {
+	private readonly LocalWebSocketHub _webSocketHub =  webSocketHub;
     public async Task BroadcastRoomStateAsync(
         APIGatewayProxyRequest request,
         IReadOnlyList<string> connectionIds,
@@ -24,7 +25,7 @@ public sealed class LocalBroadcastService(LocalWebSocketHub hub) : IBroadcastSer
         var bytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(payload, AppJsonSerializerOptions.ApplicationDefault)).AsMemory();
 
         foreach (var connectionId in connectionIds)
-            await hub.SendTextAsync(connectionId, bytes, cancellationToken).ConfigureAwait(false);
+            await _webSocketHub.SendTextAsync(connectionId, bytes, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task SendToConnectionAsync(
@@ -34,6 +35,6 @@ public sealed class LocalBroadcastService(LocalWebSocketHub hub) : IBroadcastSer
         CancellationToken cancellationToken)
     {
         var bytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(payload, AppJsonSerializerOptions.ApplicationDefault)).AsMemory();
-        await hub.SendTextAsync(connectionId, bytes, cancellationToken).ConfigureAwait(false);
+        await _webSocketHub.SendTextAsync(connectionId, bytes, cancellationToken).ConfigureAwait(false);
     }
 }

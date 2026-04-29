@@ -17,7 +17,6 @@ public class ParticipantStateDto
 
 	public bool HasVoted { get; set; }
 
-	/// <summary>Present only when <see cref="RoomStateDto.Revealed"/> is true.</summary>
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Vote { get; set; }
 }

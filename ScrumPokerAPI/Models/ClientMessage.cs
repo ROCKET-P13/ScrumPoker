@@ -1,6 +1,5 @@
 namespace ScrumPokerAPI.Models;
 
-/// <summary>Inbound WebSocket JSON body (route <c>$default</c>).</summary>
 public class ClientMessage
 {
 	public string Action { get; set; } = string.Empty;

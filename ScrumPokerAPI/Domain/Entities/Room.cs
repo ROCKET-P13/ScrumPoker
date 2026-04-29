@@ -4,7 +4,6 @@ public class Room
 {
     public Guid Id { get; private set; }
 
-    /// <summary>Short code clients use to join (e.g. 6 alphanumeric characters).</summary>
     public string Code { get; private set; } = string.Empty;
 
     public bool Revealed { get; private set; }

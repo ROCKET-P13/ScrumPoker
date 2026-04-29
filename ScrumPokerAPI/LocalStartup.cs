@@ -21,11 +21,6 @@ using ScrumPokerAPI.Services.WebSocketRequestHandler;
 
 namespace ScrumPokerAPI;
 
-/// <summary>
-/// Local Kestrel host. Values under configuration section <c>LocalDev</c> (appsettings, env, user secrets).
-/// Environment overrides: <c>LocalDev__Urls</c>, <c>LocalDev__MockApiGatewayDomainName</c>,
-/// <c>LocalDev__MockApiGatewayStage</c>, <c>LocalDev__WebSocketPath</c>.
-/// </summary>
 public static class LocalStartup
 {
     private const string LocalDevSection = "LocalDev";
@@ -33,7 +28,7 @@ public static class LocalStartup
     public static void ConfigureWebApplication(WebApplicationBuilder builder, LocalWebSocketHub hub)
     {
         var configuration = builder.Configuration;
-        var listenUrls = configuration[$"{LocalDevSection}:Urls"] ?? "http://localhost:5007";
+        var listenUrls = configuration[$"{LocalDevSection}:Urls"] ?? "http://localhost:5046";
         builder.WebHost.UseUrls(listenUrls);
 
         var connectionString = configuration.GetConnectionString("DefaultConnection")

@@ -7,10 +7,6 @@ public static class ConnectionStringResolver
 {
     private static string? _cachedConnectionString;
 
-    /// <summary>
-    /// Resolves PostgreSQL connection string: env <c>ConnectionStrings__DefaultConnection</c>,
-    /// or secret plain text when <c>DATABASE_SECRET_ARN</c> is set.
-    /// </summary>
     public static async Task<string> ResolveAsync(CancellationToken cancellationToken = default)
     {
         if (_cachedConnectionString != null)
