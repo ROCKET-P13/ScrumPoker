@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 
-namespace ScrumPokerAPI.Services;
+namespace ScrumPokerAPI.Services.WebSocketHub;
 
 public sealed class LocalWebSocketHub
 {

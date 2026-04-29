@@ -1,7 +1,7 @@
 using Amazon.Lambda.APIGatewayEvents;
 using ScrumPokerAPI.Models;
 
-namespace ScrumPokerAPI.Services;
+namespace ScrumPokerAPI.Services.BroadcastService.Interfaces;
 
 public interface IBroadcastService
 {

@@ -1,16 +1,18 @@
-using ScrumPokerAPI.Domain.Factories;
-using ScrumPokerAPI.Domain.Repositories;
+using ScrumPokerAPI.Factories.ParticipantFactory.Interfaces;
+using ScrumPokerAPI.Factories.RoomFactory.Interfaces;
+using ScrumPokerAPI.Factories.RoomStateViewModelFactory.Interfaces;
 using ScrumPokerAPI.Models;
 using ScrumPokerAPI.Models.Requests;
-using ScrumPokerAPI.ViewModels.Factories;
+using ScrumPokerAPI.Repositories.RoomRepository.Interfaces;
+using ScrumPokerAPI.Services.RoomService.Interfaces;
 
-namespace ScrumPokerAPI.Services;
+namespace ScrumPokerAPI.Services.RoomService;
 
-public class RoomService(
+public sealed class RoomService(
     IRoomRepository roomRepository,
     IRoomFactory roomFactory,
     IParticipantFactory participantFactory,
-    IRoomStateViewModelFactory roomStateViewModelFactory)
+    IRoomStateViewModelFactory roomStateViewModelFactory) : IRoomService
 {
     private readonly IRoomRepository _roomRepository = roomRepository;
     private readonly IRoomFactory _roomFactory = roomFactory;
@@ -89,7 +91,6 @@ public class RoomService(
         return await ToRoomStateAsync(roomId, cancellationToken).ConfigureAwait(false);
     }
 
-    /// <summary>Removes participant by connection id; returns room id if they were in a room.</summary>
     public async Task<Guid?> RemoveConnectionAsync(string connectionId, CancellationToken cancellationToken)
     {
         var participant = await _roomRepository.FindParticipantTrackedAsync(connectionId, cancellationToken).ConfigureAwait(false);

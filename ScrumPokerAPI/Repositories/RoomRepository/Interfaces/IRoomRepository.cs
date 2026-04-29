@@ -1,6 +1,6 @@
 using ScrumPokerAPI.Domain.Entities;
 
-namespace ScrumPokerAPI.Domain.Repositories;
+namespace ScrumPokerAPI.Repositories.RoomRepository.Interfaces;
 
 public interface IRoomRepository
 {

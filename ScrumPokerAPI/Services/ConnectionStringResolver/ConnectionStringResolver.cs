@@ -1,7 +1,7 @@
 using Amazon.SecretsManager;
 using Amazon.SecretsManager.Model;
 
-namespace ScrumPokerAPI.Services;
+namespace ScrumPokerAPI.Services.ConnectionStringResolver;
 
 public static class ConnectionStringResolver
 {

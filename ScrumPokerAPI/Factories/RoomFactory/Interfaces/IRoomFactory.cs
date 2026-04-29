@@ -1,7 +1,7 @@
 using ScrumPokerAPI.Domain.Entities;
 using ScrumPokerAPI.Models.Requests;
 
-namespace ScrumPokerAPI.Domain.Factories;
+namespace ScrumPokerAPI.Factories.RoomFactory.Interfaces;
 
 public interface IRoomFactory
 {

@@ -1,7 +1,8 @@
 using ScrumPokerAPI.Domain.Entities;
+using ScrumPokerAPI.Factories.RoomStateViewModelFactory.Interfaces;
 using ScrumPokerAPI.Models;
 
-namespace ScrumPokerAPI.ViewModels.Factories;
+namespace ScrumPokerAPI.Factories.RoomStateViewModelFactory;
 
 public sealed class RoomStateViewModelFactory : IRoomStateViewModelFactory
 {

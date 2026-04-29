@@ -1,7 +1,7 @@
 using ScrumPokerAPI.Domain.Entities;
 using ScrumPokerAPI.Models;
 
-namespace ScrumPokerAPI.ViewModels.Factories;
+namespace ScrumPokerAPI.Factories.RoomStateViewModelFactory.Interfaces;
 
 /// <summary>Maps domain aggregates to API-facing room state for WebSocket clients.</summary>
 public interface IRoomStateViewModelFactory

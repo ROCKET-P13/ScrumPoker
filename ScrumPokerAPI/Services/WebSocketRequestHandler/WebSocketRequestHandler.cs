@@ -3,13 +3,14 @@ using Amazon.Lambda.APIGatewayEvents;
 using ScrumPokerAPI.Models;
 using ScrumPokerAPI.Models.Requests;
 using ScrumPokerAPI.Serialization;
-using ScrumPokerAPI.Services;
+using ScrumPokerAPI.Services.BroadcastService.Interfaces;
+using ScrumPokerAPI.Services.RoomService.Interfaces;
 
-namespace ScrumPokerAPI;
+namespace ScrumPokerAPI.Services.WebSocketRequestHandler;
 
-public sealed class WebSocketRequestHandler(RoomService roomService, IBroadcastService broadcastService)
+public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcastService broadcastService)
 {
-    private readonly RoomService _roomService = roomService;
+    private readonly IRoomService _roomService = roomService;
     private readonly IBroadcastService _broadcastService = broadcastService;
 
     public async Task<APIGatewayProxyResponse> HandleAsync(APIGatewayProxyRequest request, CancellationToken cancellationToken)

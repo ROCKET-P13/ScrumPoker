@@ -1,7 +1,8 @@
 using ScrumPokerAPI.Domain.Entities;
+using ScrumPokerAPI.Factories.ParticipantFactory.Interfaces;
 using ScrumPokerAPI.Models.Requests;
 
-namespace ScrumPokerAPI.Domain.Factories;
+namespace ScrumPokerAPI.Factories.ParticipantFactory;
 
 public sealed class ParticipantFactory : IParticipantFactory
 {

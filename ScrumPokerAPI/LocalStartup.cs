@@ -2,13 +2,22 @@ using System.Net.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ScrumPokerAPI.Data;
-using ScrumPokerAPI.Data.Repositories;
-using ScrumPokerAPI.Data.Services;
-using ScrumPokerAPI.Domain.Factories;
-using ScrumPokerAPI.Domain.Repositories;
-using ScrumPokerAPI.Domain.Services;
-using ScrumPokerAPI.Services;
-using ScrumPokerAPI.ViewModels.Factories;
+using ScrumPokerAPI.Factories.ParticipantFactory;
+using ScrumPokerAPI.Factories.ParticipantFactory.Interfaces;
+using ScrumPokerAPI.Factories.RoomCodeAllocator;
+using ScrumPokerAPI.Factories.RoomCodeAllocator.Interfaces;
+using ScrumPokerAPI.Factories.RoomFactory;
+using ScrumPokerAPI.Factories.RoomFactory.Interfaces;
+using ScrumPokerAPI.Factories.RoomStateViewModelFactory;
+using ScrumPokerAPI.Factories.RoomStateViewModelFactory.Interfaces;
+using ScrumPokerAPI.Repositories.RoomRepository;
+using ScrumPokerAPI.Repositories.RoomRepository.Interfaces;
+using ScrumPokerAPI.Services.BroadcastService;
+using ScrumPokerAPI.Services.BroadcastService.Interfaces;
+using ScrumPokerAPI.Services.WebSocketHub;
+using ScrumPokerAPI.Services.RoomService;
+using ScrumPokerAPI.Services.RoomService.Interfaces;
+using ScrumPokerAPI.Services.WebSocketRequestHandler;
 
 namespace ScrumPokerAPI;
 
@@ -39,7 +48,7 @@ public static class LocalStartup
         builder.Services.AddScoped<IRoomFactory, RoomFactory>();
         builder.Services.AddScoped<IParticipantFactory, ParticipantFactory>();
         builder.Services.AddSingleton<IRoomStateViewModelFactory, RoomStateViewModelFactory>();
-        builder.Services.AddScoped<RoomService>();
+        builder.Services.AddScoped<IRoomService, RoomService>();
         builder.Services.AddSingleton<IBroadcastService, LocalBroadcastService>();
         builder.Services.AddScoped<WebSocketRequestHandler>();
     }

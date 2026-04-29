@@ -1,7 +1,7 @@
-using ScrumPokerAPI.Domain.Repositories;
-using ScrumPokerAPI.Domain.Services;
+using ScrumPokerAPI.Factories.RoomCodeAllocator.Interfaces;
+using ScrumPokerAPI.Repositories.RoomRepository.Interfaces;
 
-namespace ScrumPokerAPI.Data.Services;
+namespace ScrumPokerAPI.Factories.RoomCodeAllocator;
 
 public sealed class RoomCodeAllocator(IRoomRepository roomRepository) : IRoomCodeAllocator
 {

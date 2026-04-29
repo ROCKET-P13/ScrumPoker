@@ -7,8 +7,9 @@ using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Runtime;
 using ScrumPokerAPI.Models;
 using ScrumPokerAPI.Serialization;
+using ScrumPokerAPI.Services.BroadcastService.Interfaces;
 
-namespace ScrumPokerAPI.Services;
+namespace ScrumPokerAPI.Services.BroadcastService;
 
 public sealed class ApiGatewayBroadcastService : IBroadcastService
 {

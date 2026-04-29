@@ -1,8 +1,9 @@
 using ScrumPokerAPI.Domain.Entities;
-using ScrumPokerAPI.Domain.Services;
+using ScrumPokerAPI.Factories.RoomCodeAllocator.Interfaces;
+using ScrumPokerAPI.Factories.RoomFactory.Interfaces;
 using ScrumPokerAPI.Models.Requests;
 
-namespace ScrumPokerAPI.Domain.Factories;
+namespace ScrumPokerAPI.Factories.RoomFactory;
 
 public sealed class RoomFactory(IRoomCodeAllocator roomCodeAllocator) : IRoomFactory
 {

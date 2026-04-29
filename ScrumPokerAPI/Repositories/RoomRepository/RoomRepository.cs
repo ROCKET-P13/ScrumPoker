@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using ScrumPokerAPI.Data;
 using ScrumPokerAPI.Domain.Entities;
-using ScrumPokerAPI.Domain.Repositories;
+using ScrumPokerAPI.Repositories.RoomRepository.Interfaces;
 
-namespace ScrumPokerAPI.Data.Repositories;
+namespace ScrumPokerAPI.Repositories.RoomRepository;
 
 public sealed class RoomRepository(AppDbContext databaseContext) : IRoomRepository
 {
