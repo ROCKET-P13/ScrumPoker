@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using ScrumPokerAPI.Data;
 using ScrumPokerAPI.Factories.ParticipantFactory;
 using ScrumPokerAPI.Factories.ParticipantFactory.Interfaces;
@@ -17,6 +16,10 @@ using ScrumPokerAPI.Services.ConnectionStringResolver;
 using ScrumPokerAPI.Services.RoomService;
 using ScrumPokerAPI.Services.RoomService.Interfaces;
 using ScrumPokerAPI.Services.WebSocketRequestHandler;
+using ScrumPokerAPI.Finders.ParticipantFinder.Interfaces;
+using ScrumPokerAPI.Finders.ParticipantFinder;
+using ScrumPokerAPI.Finders.RoomFinder.Interfaces;
+using ScrumPokerAPI.Finders.RoomFinder;
 
 namespace ScrumPokerAPI;
 
@@ -30,6 +33,8 @@ public static class LambdaStartup
         services.AddDbContext<AppDatabaseContext>(options =>
             options.UseNpgsql(connectionString));
         services.AddScoped<IRoomRepository, RoomRepository>();
+        services.AddScoped<IRoomFinder, RoomFinder>();
+        services.AddScoped<IParticipantFinder, ParticipantFinder>();
         services.AddScoped<IRoomCodeAllocator, RoomCodeAllocator>();
         services.AddScoped<IRoomFactory, RoomFactory>();
         services.AddScoped<IParticipantFactory, ParticipantFactory>();

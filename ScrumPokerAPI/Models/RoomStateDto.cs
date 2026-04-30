@@ -6,5 +6,5 @@ public class RoomStateDTO
 
 	public bool IsRevealed { get; set; }
 
-	public List<ParticipantStateDTO> Participants { get; set; } = new();
+	public List<ParticipantStateDTO> Participants { get; set; } = [];
 }

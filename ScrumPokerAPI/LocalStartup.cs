@@ -1,7 +1,3 @@
-using System.Net.WebSockets;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using ScrumPokerAPI.Data;
 using ScrumPokerAPI.Factories.ParticipantFactory;
 using ScrumPokerAPI.Factories.ParticipantFactory.Interfaces;
@@ -20,6 +16,12 @@ using ScrumPokerAPI.Services.LocalWebSocketHub.Interfaces;
 using ScrumPokerAPI.Services.RoomService;
 using ScrumPokerAPI.Services.RoomService.Interfaces;
 using ScrumPokerAPI.Services.WebSocketRequestHandler;
+using System.Net.WebSockets;
+using Microsoft.EntityFrameworkCore;
+using ScrumPokerAPI.Finders.ParticipantFinder.Interfaces;
+using ScrumPokerAPI.Finders.ParticipantFinder;
+using ScrumPokerAPI.Finders.RoomFinder.Interfaces;
+using ScrumPokerAPI.Finders.RoomFinder;
 
 namespace ScrumPokerAPI;
 
@@ -43,6 +45,8 @@ public static class LocalStartup
 		);
 
         builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+        builder.Services.AddScoped<IRoomFinder, RoomFinder>();
+        builder.Services.AddScoped<IParticipantFinder, ParticipantFinder>();
         builder.Services.AddScoped<IRoomCodeAllocator, RoomCodeAllocator>();
         builder.Services.AddScoped<IRoomFactory, RoomFactory>();
         builder.Services.AddScoped<IParticipantFactory, ParticipantFactory>();
@@ -140,11 +144,9 @@ public static class LocalStartup
                         mockDomain,
                         mockStage);
 
-                    await using (var scope = scopeFactory.CreateAsyncScope())
-                    {
-                        var webSocketRequestHandler = scope.ServiceProvider.GetRequiredService<WebSocketRequestHandler>();
-                        await webSocketRequestHandler.ProcessRequest(messageEvent, connectionLifetime).ConfigureAwait(false);
-                    }
+                    await using var scope = scopeFactory.CreateAsyncScope();
+                    var webSocketRequestHandler = scope.ServiceProvider.GetRequiredService<WebSocketRequestHandler>();
+                    await webSocketRequestHandler.ProcessRequest(messageEvent, connectionLifetime).ConfigureAwait(false);
                 }
             }
             finally
@@ -152,11 +154,9 @@ public static class LocalStartup
                 webSocketHub.Remove(connectionId);
                 var disconnectEvent = LocalApiGatewayRequestBuilder.Create(
                     connectionId, "$disconnect", null, mockDomain, mockStage);
-                await using (var scope = scopeFactory.CreateAsyncScope())
-                {
-                    var webSocketRequestHandler = scope.ServiceProvider.GetRequiredService<WebSocketRequestHandler>();
-                    await webSocketRequestHandler.ProcessRequest(disconnectEvent, connectionLifetime).ConfigureAwait(false);
-                }
+                await using var scope = scopeFactory.CreateAsyncScope();
+                var webSocketRequestHandler = scope.ServiceProvider.GetRequiredService<WebSocketRequestHandler>();
+                await webSocketRequestHandler.ProcessRequest(disconnectEvent, connectionLifetime).ConfigureAwait(false);
             }
         });
     }

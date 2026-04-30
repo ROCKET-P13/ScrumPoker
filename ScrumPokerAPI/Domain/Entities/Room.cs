@@ -10,7 +10,7 @@ public class Room
 
     public DateTimeOffset CreatedAt { get; set; }
 
-    public ICollection<Participant> Participants { get; private set; } = new List<Participant>();
+    public ICollection<Participant> Participants { get; private set; } = [];
 
     public Participant AddParticipant(Participant participant)
     {
