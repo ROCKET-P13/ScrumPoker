@@ -42,7 +42,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
             if (roomId == null)
                 return EmptySuccessResponse();
 
-            var targets = await _roomService.GetConnectionIdsForRoomAsync(roomId.Value, CancellationToken.None).ConfigureAwait(false);
+            var targets = await _roomService.GetConnectionIdsForRoom(roomId.Value, CancellationToken.None).ConfigureAwait(false);
             if (targets.Count == 0)
                 return EmptySuccessResponse();
 
@@ -132,7 +132,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 			)
 			.ConfigureAwait(false);
 
-        var roomId = await _roomService.GetRoomIdForConnectionAsync(connectionId, cancellationToken).ConfigureAwait(false);
+        var roomId = await _roomService.GetRoomIdForConnection(connectionId, cancellationToken).ConfigureAwait(false);
         if (roomId == null)
         {
             await SendErrorAsync(request, connectionId, "Could not resolve room after create.", cancellationToken)
@@ -140,7 +140,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
             return EmptySuccessResponse();
         }
 
-        var targets = await _roomService.GetConnectionIdsForRoomAsync(roomId.Value, cancellationToken).ConfigureAwait(false);
+        var targets = await _roomService.GetConnectionIdsForRoom(roomId.Value, cancellationToken).ConfigureAwait(false);
         await _broadcastService.BroadcastRoomState(request, targets, state, cancellationToken).ConfigureAwait(false);
 
         return EmptySuccessResponse();
@@ -161,7 +161,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
             return EmptySuccessResponse();
         }
 
-        var state = await _roomService.JoinRoomAsync(
+        var state = await _roomService.JoinRoom(
             connectionId,
             new JoinRoomRequestDto
 			{
@@ -178,13 +178,13 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
             return EmptySuccessResponse();
         }
 
-        var roomId = await _roomService.GetRoomIdForConnectionAsync(connectionId, cancellationToken).ConfigureAwait(false);
+        var roomId = await _roomService.GetRoomIdForConnection(connectionId, cancellationToken).ConfigureAwait(false);
         if (roomId == null)
 		{
             return EmptySuccessResponse();
 		}
 
-        var targets = await _roomService.GetConnectionIdsForRoomAsync(roomId.Value, cancellationToken).ConfigureAwait(false);
+        var targets = await _roomService.GetConnectionIdsForRoom(roomId.Value, cancellationToken).ConfigureAwait(false);
         await _broadcastService.BroadcastRoomState(request, targets, state, cancellationToken).ConfigureAwait(false);
 
         return EmptySuccessResponse();
@@ -213,11 +213,11 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
             return EmptySuccessResponse();
         }
 
-        var roomId = await _roomService.GetRoomIdForConnectionAsync(connectionId, cancellationToken).ConfigureAwait(false);
+        var roomId = await _roomService.GetRoomIdForConnection(connectionId, cancellationToken).ConfigureAwait(false);
         if (roomId == null)
             return EmptySuccessResponse();
 
-        var targets = await _roomService.GetConnectionIdsForRoomAsync(roomId.Value, cancellationToken).ConfigureAwait(false);
+        var targets = await _roomService.GetConnectionIdsForRoom(roomId.Value, cancellationToken).ConfigureAwait(false);
         await _broadcastService.BroadcastRoomState(request, targets, state, cancellationToken).ConfigureAwait(false);
 
         return EmptySuccessResponse();
@@ -232,11 +232,11 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
             return EmptySuccessResponse();
         }
 
-        var roomId = await _roomService.GetRoomIdForConnectionAsync(connectionId, cancellationToken).ConfigureAwait(false);
+        var roomId = await _roomService.GetRoomIdForConnection(connectionId, cancellationToken).ConfigureAwait(false);
         if (roomId == null)
             return EmptySuccessResponse();
 
-        var targets = await _roomService.GetConnectionIdsForRoomAsync(roomId.Value, cancellationToken).ConfigureAwait(false);
+        var targets = await _roomService.GetConnectionIdsForRoom(roomId.Value, cancellationToken).ConfigureAwait(false);
         await _broadcastService.BroadcastRoomState(request, targets, state, cancellationToken).ConfigureAwait(false);
 
         return EmptySuccessResponse();
@@ -251,11 +251,11 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
             return EmptySuccessResponse();
         }
 
-        var roomId = await _roomService.GetRoomIdForConnectionAsync(connectionId, cancellationToken).ConfigureAwait(false);
+        var roomId = await _roomService.GetRoomIdForConnection(connectionId, cancellationToken).ConfigureAwait(false);
         if (roomId == null)
             return EmptySuccessResponse();
 
-        var targets = await _roomService.GetConnectionIdsForRoomAsync(roomId.Value, cancellationToken).ConfigureAwait(false);
+        var targets = await _roomService.GetConnectionIdsForRoom(roomId.Value, cancellationToken).ConfigureAwait(false);
         await _broadcastService.BroadcastRoomState(request, targets, state, cancellationToken).ConfigureAwait(false);
 
         return EmptySuccessResponse();

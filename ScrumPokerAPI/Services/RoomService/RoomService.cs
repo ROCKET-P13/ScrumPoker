@@ -56,7 +56,7 @@ public sealed class RoomService(
         return await ToRoomStateAsync(room.Id, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<RoomStateDTO?> JoinRoomAsync(string connectionId, JoinRoomRequestDto dto, CancellationToken cancellationToken)
+    public async Task<RoomStateDTO?> JoinRoom(string connectionId, JoinRoomRequestDto dto, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(dto);
 
@@ -161,7 +161,7 @@ public sealed class RoomService(
         return roomId;
     }
 
-    public Task<IReadOnlyList<string>> GetConnectionIdsForRoomAsync(Guid roomId, CancellationToken cancellationToken)
+    public Task<IReadOnlyList<string>> GetConnectionIdsForRoom(Guid roomId, CancellationToken cancellationToken)
     {
         return _participantFinder.ListConnectionIdsForRoomAsync(roomId, cancellationToken);
     }
@@ -175,7 +175,7 @@ public sealed class RoomService(
         return await ToRoomStateAsync(participant.RoomId, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<Guid?> GetRoomIdForConnectionAsync(string connectionId, CancellationToken cancellationToken)
+    public async Task<Guid?> GetRoomIdForConnection(string connectionId, CancellationToken cancellationToken)
     {
         var participant = await _participantFinder.FindByConnectionIdAsync(connectionId, cancellationToken).ConfigureAwait(false);
         return participant?.RoomId;
