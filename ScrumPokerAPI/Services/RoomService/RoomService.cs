@@ -1,3 +1,4 @@
+using ScrumPokerAPI.Factories.ParticipantFactory.DTOs;
 using ScrumPokerAPI.Factories.ParticipantFactory.Interfaces;
 using ScrumPokerAPI.Factories.RoomFactory.Interfaces;
 using ScrumPokerAPI.Factories.RoomStateViewModelFactory.Interfaces;
@@ -25,8 +26,18 @@ public sealed class RoomService(
         ArgumentNullException.ThrowIfNull(dto);
 
         var room = await _roomFactory.FromDtos(dto, connectionId, cancellationToken).ConfigureAwait(false);
+        var participant = _participantFactory.FromDto(
+            new ParticipantFactoryDTO
+            {
+                ConnectionId = connectionId,
+                DisplayName = dto.DisplayName,
+                RoomId = room.Id,
+            });
+
+        room.AddParticipant(participant);
+
         _roomRepository.Add(room);
-        await _roomRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _roomRepository.Upsert(cancellationToken).ConfigureAwait(false);
 
         return await ToRoomStateAsync(room.Id, cancellationToken).ConfigureAwait(false);
     }
@@ -37,20 +48,35 @@ public sealed class RoomService(
 
         var normalized = dto.RoomCode.Trim().ToUpperInvariant();
 
-        var room = await _roomRepository.GetRoomByCodeForMutationAsync(normalized, cancellationToken).ConfigureAwait(false);
-        if (room == null)
+        var roomId = await _roomRepository.FindRoomIdByCodeAsync(normalized, cancellationToken).ConfigureAwait(false);
+        if (roomId == null)
             return null;
 
         var existingSameConnection = await _roomRepository.FindParticipantTrackedAsync(connectionId, cancellationToken).ConfigureAwait(false);
         if (existingSameConnection != null)
         {
+            if (existingSameConnection.RoomId == roomId.Value)
+            {
+                existingSameConnection.UpdateDisplayName(dto.DisplayName);
+                await _roomRepository.Upsert(cancellationToken).ConfigureAwait(false);
+                return await ToRoomStateAsync(roomId.Value, cancellationToken).ConfigureAwait(false);
+            }
+
             _roomRepository.Remove(existingSameConnection);
         }
 
-        _participantFactory.AddFromJoinDto(dto, room, connectionId);
-        await _roomRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        var newParticipant = _participantFactory.FromDto(
+            new ParticipantFactoryDTO
+            {
+                ConnectionId = connectionId,
+                DisplayName = dto.DisplayName,
+                RoomId = roomId.Value,
+            });
+        _roomRepository.Add(newParticipant);
 
-        return await ToRoomStateAsync(room.Id, cancellationToken).ConfigureAwait(false);
+        await _roomRepository.Upsert(cancellationToken).ConfigureAwait(false);
+
+        return await ToRoomStateAsync(roomId.Value, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<RoomStateDTO?> VoteAsync(string connectionId, VoteRequestDto dto, CancellationToken cancellationToken)
@@ -61,8 +87,8 @@ public sealed class RoomService(
         if (participant == null)
             return null;
 
-        _participantFactory.ApplyVoteFromDto(participant, dto);
-        await _roomRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        participant.RecordVote(dto.Value);
+        await _roomRepository.Upsert(cancellationToken).ConfigureAwait(false);
 
         return await ToRoomStateAsync(participant.RoomId, cancellationToken).ConfigureAwait(false);
     }
@@ -74,7 +100,7 @@ public sealed class RoomService(
             return null;
 
         participant.Room.RevealVotes();
-        await _roomRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _roomRepository.Upsert(cancellationToken).ConfigureAwait(false);
 
         return await ToRoomStateAsync(participant.RoomId, cancellationToken).ConfigureAwait(false);
     }
@@ -87,7 +113,7 @@ public sealed class RoomService(
 
         var roomId = participant.RoomId;
         participant.Room.ResetRound();
-        await _roomRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _roomRepository.Upsert(cancellationToken).ConfigureAwait(false);
 
         return await ToRoomStateAsync(roomId, cancellationToken).ConfigureAwait(false);
     }
@@ -100,7 +126,7 @@ public sealed class RoomService(
 
         var roomId = participant.RoomId;
         _roomRepository.Remove(participant);
-        await _roomRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _roomRepository.Upsert(cancellationToken).ConfigureAwait(false);
 
         var anyLeft = await _roomRepository.AnyParticipantInRoomAsync(roomId, cancellationToken).ConfigureAwait(false);
         if (!anyLeft)
@@ -108,7 +134,7 @@ public sealed class RoomService(
             var room = await _roomRepository.GetRoomByIdForMutationAsync(roomId, cancellationToken).ConfigureAwait(false);
             if (room != null)
                 _roomRepository.Remove(room);
-            await _roomRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await _roomRepository.Upsert(cancellationToken).ConfigureAwait(false);
         }
 
         return roomId;

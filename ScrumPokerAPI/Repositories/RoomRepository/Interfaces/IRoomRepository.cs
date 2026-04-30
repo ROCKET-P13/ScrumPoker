@@ -6,7 +6,7 @@ public interface IRoomRepository
 {
     Task<bool> IsRoomCodeAllocatedAsync(string code, CancellationToken cancellationToken);
 
-    Task<Room?> GetRoomByCodeForMutationAsync(string normalizedRoomCode, CancellationToken cancellationToken);
+    Task<Guid?> FindRoomIdByCodeAsync(string normalizedRoomCode, CancellationToken cancellationToken);
 
     Task<Room?> GetRoomByIdForMutationAsync(Guid roomId, CancellationToken cancellationToken);
 
@@ -28,9 +28,11 @@ public interface IRoomRepository
 
     void Add(Room room);
 
+    void Add(Participant participant);
+
     void Remove(Room room);
 
     void Remove(Participant participant);
 
-    Task SaveChangesAsync(CancellationToken cancellationToken);
+    Task Upsert(CancellationToken cancellationToken);
 }

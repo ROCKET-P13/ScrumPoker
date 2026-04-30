@@ -14,8 +14,15 @@ public sealed class RoomFactory(IRoomCodeAllocator roomCodeAllocator) : IRoomFac
         ArgumentNullException.ThrowIfNull(dto);
 
         var code = await _roomCodeAllocator.Allocate(cancellationToken).ConfigureAwait(false);
-        var room = Room.CreateNew(code);
-        room.AddParticipant(Guid.NewGuid(), connectionId, dto.DisplayName.Trim());
+		
+		var room = new Room
+		{
+			Id = Guid.NewGuid(),
+            Code = code,
+            CreatedAt = DateTimeOffset.UtcNow,
+		};
+
+        // room.AddParticipant(Guid.NewGuid(), connectionId, dto.DisplayName.Trim());
         return room;
     }
 }

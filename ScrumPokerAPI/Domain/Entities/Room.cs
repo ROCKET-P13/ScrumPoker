@@ -2,37 +2,27 @@ namespace ScrumPokerAPI.Domain.Entities;
 
 public class Room
 {
-    public Guid Id { get; private set; }
+    public Guid Id { get; set; }
 
-    public string Code { get; private set; } = string.Empty;
+    public string Code { get; set; } = string.Empty;
 
-    public bool IsRevealed { get; private set; }
+    public bool IsRevealed { get; private set; } = false;
 
-    public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
     public ICollection<Participant> Participants { get; private set; } = new List<Participant>();
 
-    private Room()
+    public Participant AddParticipant(Participant participant)
     {
-    }
-
-    public static Room CreateNew(string code)
-    {
-        return new Room
-        {
-            Id = Guid.NewGuid(),
-            Code = code,
-            IsRevealed = false,
-            CreatedAt = DateTimeOffset.UtcNow,
-            Participants = new List<Participant>(),
-        };
-    }
-
-    public Participant AddParticipant(Guid participantId, string connectionId, string displayName)
-    {
-        var participant = Participant.CreateForRoom(participantId, this, connectionId, displayName);
+        participant.RoomId = Id;
+        participant.Room = this;
         Participants.Add(participant);
         return participant;
+    }
+
+    public void RemoveParticipant(Participant participant)
+    {
+        Participants.Remove(participant);
     }
 
     public void RevealVotes()

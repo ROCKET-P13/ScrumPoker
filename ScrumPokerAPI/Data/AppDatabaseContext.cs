@@ -18,11 +18,6 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
 			entity.Property(e => e.IsRevealed).HasColumnName("is_revealed");
 			entity.Property(e => e.CreatedAt).HasColumnName("created_at");
 
-			entity.HasMany(e => e.Participants)
-				.WithOne()
-				.HasForeignKey(p => p.RoomId)
-				.OnDelete(DeleteBehavior.Cascade);
-
             entity.HasKey(room => room.Id);
             entity.HasIndex(room => room.Code).IsUnique();
             entity.Property(room => room.Code).HasMaxLength(32).IsRequired();

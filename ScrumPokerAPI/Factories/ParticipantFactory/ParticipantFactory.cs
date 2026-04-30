@@ -1,24 +1,21 @@
 using ScrumPokerAPI.Domain.Entities;
+using ScrumPokerAPI.Factories.ParticipantFactory.DTOs;
 using ScrumPokerAPI.Factories.ParticipantFactory.Interfaces;
-using ScrumPokerAPI.Models.Requests;
 
 namespace ScrumPokerAPI.Factories.ParticipantFactory;
 
 public sealed class ParticipantFactory : IParticipantFactory
 {
-    public Participant AddFromJoinDto(JoinRoomRequestDto dto, Room room, string connectionId)
+    public Participant FromDto(ParticipantFactoryDTO dto)
     {
         ArgumentNullException.ThrowIfNull(dto);
-        ArgumentNullException.ThrowIfNull(room);
 
-        return room.AddParticipant(Guid.NewGuid(), connectionId, dto.DisplayName.Trim());
-    }
-
-    public void ApplyVoteFromDto(Participant participant, VoteRequestDto dto)
-    {
-        ArgumentNullException.ThrowIfNull(participant);
-        ArgumentNullException.ThrowIfNull(dto);
-
-        participant.RecordVote(dto.Value);
+        return new Participant
+        {
+            Id = Guid.NewGuid(),
+            RoomId = dto.RoomId,
+            ConnectionId = dto.ConnectionId,
+            DisplayName = dto.DisplayName.Trim(),
+        };
     }
 }

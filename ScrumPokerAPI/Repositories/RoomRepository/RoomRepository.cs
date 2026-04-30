@@ -14,11 +14,13 @@ public sealed class RoomRepository(AppDatabaseContext databaseContext) : IRoomRe
         return _databaseContext.Rooms.AnyAsync(room => room.Code == code, cancellationToken);
     }
 
-    public Task<Room?> GetRoomByCodeForMutationAsync(string normalizedRoomCode, CancellationToken cancellationToken)
+    public async Task<Guid?> FindRoomIdByCodeAsync(string normalizedRoomCode, CancellationToken cancellationToken)
     {
-        return _databaseContext.Rooms
-            .Include(room => room.Participants)
-            .FirstOrDefaultAsync(room => room.Code == normalizedRoomCode, cancellationToken);
+        return await _databaseContext.Rooms.AsNoTracking()
+            .Where(room => room.Code == normalizedRoomCode)
+            .Select(room => (Guid?)room.Id)
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 
     public Task<Room?> GetRoomByIdForMutationAsync(Guid roomId, CancellationToken cancellationToken)
@@ -89,6 +91,12 @@ public sealed class RoomRepository(AppDatabaseContext databaseContext) : IRoomRe
         _databaseContext.Rooms.Add(room);
     }
 
+    public void Add(Participant participant)
+    {
+        ArgumentNullException.ThrowIfNull(participant);
+        _databaseContext.Participants.Add(participant);
+    }
+
     public void Remove(Room room)
     {
         _databaseContext.Rooms.Remove(room);
@@ -99,7 +107,7 @@ public sealed class RoomRepository(AppDatabaseContext databaseContext) : IRoomRe
         _databaseContext.Participants.Remove(participant);
     }
 
-    public Task SaveChangesAsync(CancellationToken cancellationToken)
+    public Task Upsert(CancellationToken cancellationToken)
     {
         return _databaseContext.SaveChangesAsync(cancellationToken);
     }
