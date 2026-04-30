@@ -38,7 +38,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 		
         try
         {
-            var roomId = await _roomService.RemoveConnectionAsync(connectionId, CancellationToken.None).ConfigureAwait(false);
+            var roomId = await _roomService.RemoveConnection(connectionId, CancellationToken.None).ConfigureAwait(false);
             if (roomId == null)
                 return EmptySuccessResponse();
 
@@ -46,7 +46,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
             if (targets.Count == 0)
                 return EmptySuccessResponse();
 
-            var state = await _roomService.GetRoomStateAsync(roomId.Value, CancellationToken.None).ConfigureAwait(false);
+            var state = await _roomService.GetRoomState(roomId.Value, CancellationToken.None).ConfigureAwait(false);
             if (state != null)
                 await _broadcastService.BroadcastRoomState(request, targets, state, CancellationToken.None).ConfigureAwait(false);
 

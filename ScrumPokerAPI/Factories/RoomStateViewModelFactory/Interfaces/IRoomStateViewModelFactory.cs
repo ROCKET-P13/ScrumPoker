@@ -5,5 +5,5 @@ namespace ScrumPokerAPI.Factories.RoomStateViewModelFactory.Interfaces;
 
 public interface IRoomStateViewModelFactory
 {
-    RoomStateDTO FromEntities(Room room, IReadOnlyList<Participant> participants);
+    RoomStateDTO FromRoom(Room room);
 }

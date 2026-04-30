@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using ScrumPokerAPI.Entities;
 using ScrumPokerAPI.Factories.ParticipantFactory.DTOs;
 using ScrumPokerAPI.Factories.ParticipantFactory.Interfaces;
 using ScrumPokerAPI.Factories.RoomFactory.Interfaces;
@@ -144,7 +143,7 @@ public sealed class RoomService(
         return await ToRoomStateAsync(roomId, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<Guid?> RemoveConnectionAsync(string connectionId, CancellationToken cancellationToken)
+    public async Task<Guid?> RemoveConnection(string connectionId, CancellationToken cancellationToken)
     {
         var participant = await _participantRepository.Participants
             .FirstOrDefaultAsync(p => p.ConnectionId == connectionId, cancellationToken)
@@ -172,14 +171,13 @@ public sealed class RoomService(
         return participant?.RoomId;
     }
 
-    public async Task<RoomStateDTO?> GetRoomStateAsync(Guid roomId, CancellationToken cancellationToken)
+    public async Task<RoomStateDTO?> GetRoomState(Guid roomId, CancellationToken cancellationToken)
     {
         var room = await _roomFinder.FindById(roomId, cancellationToken).ConfigureAwait(false);
         if (room == null)
             return null;
 
-        var participants = OrderParticipantsByDisplayName(room);
-        return _roomStateViewModelFactory.FromEntities(room, participants);
+        return _roomStateViewModelFactory.FromRoom(room);
     }
 
     private async Task RemoveRoomIfEmptyAsync(Guid roomId, CancellationToken cancellationToken)
@@ -197,15 +195,9 @@ public sealed class RoomService(
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    private static IReadOnlyList<Participant> OrderParticipantsByDisplayName(Room room)
-    {
-        return [.. room.Participants.OrderBy(participant => participant.DisplayName)];
-    }
-
     private async Task<RoomStateDTO> ToRoomStateAsync(Guid roomId, CancellationToken cancellationToken)
     {
         var room = await _roomFinder.FindById(roomId, cancellationToken).ConfigureAwait(false) ?? throw new InvalidOperationException("Room not found.");
-        var participants = OrderParticipantsByDisplayName(room);
-        return _roomStateViewModelFactory.FromEntities(room, participants);
+        return _roomStateViewModelFactory.FromRoom(room);
     }
 }

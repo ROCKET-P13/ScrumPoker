@@ -15,11 +15,11 @@ public interface IRoomService
 
     Task<RoomStateDTO?> ResetRound(string connectionId, CancellationToken cancellationToken);
 
-    Task<Guid?> RemoveConnectionAsync(string connectionId, CancellationToken cancellationToken);
+    Task<Guid?> RemoveConnection(string connectionId, CancellationToken cancellationToken);
 
     Task<IReadOnlyList<string>> GetConnectionIdsForRoom(Guid roomId, CancellationToken cancellationToken);
 
     Task<Guid?> GetRoomIdForConnection(string connectionId, CancellationToken cancellationToken);
 
-    Task<RoomStateDTO?> GetRoomStateAsync(Guid roomId, CancellationToken cancellationToken);
+    Task<RoomStateDTO?> GetRoomState(Guid roomId, CancellationToken cancellationToken);
 }
