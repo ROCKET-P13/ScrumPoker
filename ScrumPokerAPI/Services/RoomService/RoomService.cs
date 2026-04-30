@@ -12,7 +12,8 @@ public sealed class RoomService(
     IRoomRepository roomRepository,
     IRoomFactory roomFactory,
     IParticipantFactory participantFactory,
-    IRoomStateViewModelFactory roomStateViewModelFactory) : IRoomService
+    IRoomStateViewModelFactory roomStateViewModelFactory
+) : IRoomService
 {
     private readonly IRoomRepository _roomRepository = roomRepository;
     private readonly IRoomFactory _roomFactory = roomFactory;
@@ -23,7 +24,7 @@ public sealed class RoomService(
     {
         ArgumentNullException.ThrowIfNull(dto);
 
-        var room = await _roomFactory.CreateFromDtoAsync(dto, connectionId, cancellationToken).ConfigureAwait(false);
+        var room = await _roomFactory.FromDtos(dto, connectionId, cancellationToken).ConfigureAwait(false);
         _roomRepository.Add(room);
         await _roomRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 

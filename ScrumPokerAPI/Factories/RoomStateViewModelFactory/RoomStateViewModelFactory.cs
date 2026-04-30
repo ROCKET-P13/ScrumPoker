@@ -12,12 +12,14 @@ public sealed class RoomStateViewModelFactory : IRoomStateViewModelFactory
         {
             RoomCode = room.Code,
             IsRevealed = room.IsRevealed,
-            Participants = participants.Select(participant => new ParticipantStateDTO
-            {
-                DisplayName = participant.DisplayName,
-                HasVoted = !string.IsNullOrEmpty(participant.Vote),
-                Vote = room.IsRevealed ? participant.Vote : null,
-            }).ToList(),
+            Participants = [
+				.. participants.Select(participant => new ParticipantStateDTO
+				{
+					DisplayName = participant.DisplayName,
+					HasVoted = !string.IsNullOrEmpty(participant.Vote),
+					Vote = room.IsRevealed ? participant.Vote : null,
+				})
+			],
         };
     }
 }

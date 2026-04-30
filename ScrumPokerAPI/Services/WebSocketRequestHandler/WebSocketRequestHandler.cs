@@ -13,7 +13,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
     private readonly IRoomService _roomService = roomService;
     private readonly IBroadcastService _broadcastService = broadcastService;
 
-    public async Task<APIGatewayProxyResponse> HandleAsync(APIGatewayProxyRequest request, CancellationToken cancellationToken)
+    public async Task<APIGatewayProxyResponse> ProcessRequest(APIGatewayProxyRequest request, CancellationToken cancellationToken)
     {
         var route = request.RequestContext.RouteKey ?? string.Empty;
         return route switch
@@ -160,8 +160,15 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 
         var state = await _roomService.JoinRoomAsync(
             connectionId,
-            new JoinRoomRequestDto { RoomCode = normalizedRoomCode, DisplayName = trimmedDisplayName },
-            cancellationToken).ConfigureAwait(false);
+            new JoinRoomRequestDto
+			{
+				RoomCode = normalizedRoomCode,
+				DisplayName = trimmedDisplayName
+			},
+            cancellationToken
+			)
+			.ConfigureAwait(false);
+
         if (state == null)
         {
             await SendErrorAsync(request, connectionId, "Room not found.", cancellationToken).ConfigureAwait(false);
@@ -170,7 +177,9 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 
         var roomId = await _roomService.GetRoomIdForConnectionAsync(connectionId, cancellationToken).ConfigureAwait(false);
         if (roomId == null)
+		{
             return EmptySuccessResponse();
+		}
 
         var targets = await _roomService.GetConnectionIdsForRoomAsync(roomId.Value, cancellationToken).ConfigureAwait(false);
         await _broadcastService.BroadcastRoomStateAsync(request, targets, state, cancellationToken).ConfigureAwait(false);
@@ -211,10 +220,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         return EmptySuccessResponse();
     }
 
-    private async Task<APIGatewayProxyResponse> HandleRevealAsync(
-        APIGatewayProxyRequest request,
-        string connectionId,
-        CancellationToken cancellationToken)
+    private async Task<APIGatewayProxyResponse> HandleRevealAsync(APIGatewayProxyRequest request, string connectionId, CancellationToken cancellationToken)
     {
         var state = await _roomService.RevealAsync(connectionId, cancellationToken).ConfigureAwait(false);
         if (state == null)
@@ -233,10 +239,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         return EmptySuccessResponse();
     }
 
-    private async Task<APIGatewayProxyResponse> HandleResetAsync(
-        APIGatewayProxyRequest request,
-        string connectionId,
-        CancellationToken cancellationToken)
+    private async Task<APIGatewayProxyResponse> HandleResetAsync(APIGatewayProxyRequest request, string connectionId, CancellationToken cancellationToken)
     {
         var state = await _roomService.ResetRoundAsync(connectionId, cancellationToken).ConfigureAwait(false);
         if (state == null)
@@ -261,7 +264,16 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         string errorMessage,
         CancellationToken cancellationToken)
     {
-        return _broadcastService.SendToConnectionAsync(request, connectionId, new { type = "error", message = errorMessage }, cancellationToken);
+        return _broadcastService.SendToConnectionAsync(
+			request,
+			connectionId,
+			new
+			{
+				type = "error",
+				message = errorMessage
+			},
+			cancellationToken
+		);
     }
 
     private static APIGatewayProxyResponse EmptySuccessResponse() =>

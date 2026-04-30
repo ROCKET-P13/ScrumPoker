@@ -11,16 +11,16 @@ public sealed class RoomCodeAllocator(IRoomRepository roomRepository) : IRoomCod
 
     private readonly IRoomRepository _roomRepository = roomRepository;
 
-    public async Task<string> AllocateAsync(CancellationToken cancellationToken)
+    public async Task<string> Allocate(CancellationToken cancellationToken)
     {
         for (var attempt = 0; attempt < MaxAttempts; attempt++)
         {
-            var code = new string(Enumerable.Range(0, CodeLength)
-                .Select(_ => CodeAlphabet[Random.Shared.Next(CodeAlphabet.Length)])
-                .ToArray());
+            var code = new string([.. Enumerable.Range(0, CodeLength).Select(_ => CodeAlphabet[Random.Shared.Next(CodeAlphabet.Length)])]);
             var allocated = await _roomRepository.IsRoomCodeAllocatedAsync(code, cancellationToken).ConfigureAwait(false);
             if (!allocated)
+			{
                 return code;
+			}
         }
 
         throw new InvalidOperationException("Could not allocate a unique room code.");

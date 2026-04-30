@@ -5,5 +5,5 @@ namespace ScrumPokerAPI.Factories.RoomFactory.Interfaces;
 
 public interface IRoomFactory
 {
-    Task<Room> CreateFromDtoAsync(CreateRoomRequestDto dto, string connectionId, CancellationToken cancellationToken);
+    Task<Room> FromDtos(CreateRoomRequestDto dto, string connectionId, CancellationToken cancellationToken);
 }
