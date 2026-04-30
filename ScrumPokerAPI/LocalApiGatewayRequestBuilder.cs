@@ -9,7 +9,8 @@ public static class LocalApiGatewayRequestBuilder
         string routeKey,
         string? body,
         string mockApiGatewayDomainName,
-        string mockApiGatewayStage)
+        string mockApiGatewayStage
+	)
     {
         return new APIGatewayProxyRequest
         {
