@@ -9,7 +9,7 @@ public sealed class ParticipantFinder(AppDatabaseContext databaseContext) : IPar
 {
     private readonly AppDatabaseContext _databaseContext = databaseContext;
 
-    public Task<Participant?> FindByConnectionIdAsync(string connectionId, CancellationToken cancellationToken)
+    public Task<Participant?> FindByConnectionId(string connectionId, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(connectionId);
         return _databaseContext.Participants.AsNoTracking()
