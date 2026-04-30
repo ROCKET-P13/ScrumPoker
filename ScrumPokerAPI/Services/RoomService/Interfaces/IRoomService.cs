@@ -19,8 +19,6 @@ public interface IRoomService
 
     Task<IReadOnlyList<string>> GetConnectionIdsForRoom(Guid roomId, CancellationToken cancellationToken);
 
-    Task<RoomStateDTO?> GetStateForConnectionAsync(string connectionId, CancellationToken cancellationToken);
-
     Task<Guid?> GetRoomIdForConnection(string connectionId, CancellationToken cancellationToken);
 
     Task<RoomStateDTO?> GetRoomStateAsync(Guid roomId, CancellationToken cancellationToken);

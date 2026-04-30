@@ -166,15 +166,6 @@ public sealed class RoomService(
         return _participantFinder.ListConnectionIdsForRoomAsync(roomId, cancellationToken);
     }
 
-    public async Task<RoomStateDTO?> GetStateForConnectionAsync(string connectionId, CancellationToken cancellationToken)
-    {
-        var participant = await _participantFinder.FindByConnectionIdAsync(connectionId, cancellationToken).ConfigureAwait(false);
-        if (participant == null)
-            return null;
-
-        return await ToRoomStateAsync(participant.RoomId, cancellationToken).ConfigureAwait(false);
-    }
-
     public async Task<Guid?> GetRoomIdForConnection(string connectionId, CancellationToken cancellationToken)
     {
         var participant = await _participantFinder.FindByConnectionIdAsync(connectionId, cancellationToken).ConfigureAwait(false);
