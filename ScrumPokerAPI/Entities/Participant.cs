@@ -12,6 +12,8 @@ public class Participant
 
     public string DisplayName { get; set; } = string.Empty;
 
+    public bool IsRoomAdmin { get; set; }
+
     public string? Vote { get; private set; }
 
     public void UpdateDisplayName(string displayName)

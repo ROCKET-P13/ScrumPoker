@@ -41,6 +41,10 @@ namespace ScrumPokerAPI.Migrations
                         .HasColumnType("character varying(256)")
                         .HasColumnName("display_name");
 
+                    b.Property<bool>("IsRoomAdmin")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_room_admin");
+
                     b.Property<Guid>("RoomId")
                         .HasColumnType("uuid")
                         .HasColumnName("room_id");

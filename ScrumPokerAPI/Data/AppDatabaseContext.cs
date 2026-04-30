@@ -30,6 +30,7 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
 			entity.Property(e => e.RoomId).HasColumnName("room_id");
 			entity.Property(e => e.ConnectionId).HasColumnName("connection_id");
 			entity.Property(e => e.DisplayName).HasColumnName("display_name");
+			entity.Property(e => e.IsRoomAdmin).HasColumnName("is_room_admin");
 			entity.Property(e => e.Vote).HasColumnName("vote");
 
             entity.HasKey(e => e.Id);

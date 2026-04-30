@@ -16,6 +16,7 @@ public sealed class RoomStateViewModelFactory : IRoomStateViewModelFactory
 				.. room.Participants.Select(participant => new ParticipantViewModel
 				{
 					DisplayName = participant.DisplayName,
+					IsRoomAdmin = participant.IsRoomAdmin,
 					HasVoted = !string.IsNullOrEmpty(participant.Vote),
 					Vote = room.IsRevealed ? participant.Vote : null,
 				})

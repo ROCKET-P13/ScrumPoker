@@ -33,6 +33,7 @@ namespace ScrumPokerAPI.Migrations
                     room_id = table.Column<Guid>(type: "uuid", nullable: false),
                     connection_id = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     display_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    is_room_admin = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     vote = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true)
                 },
                 constraints: table =>
