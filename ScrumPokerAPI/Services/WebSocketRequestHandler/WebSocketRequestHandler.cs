@@ -90,15 +90,15 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
             switch (action)
             {
                 case WebSocketRequestTypes.CreateRoom:
-                    return await HandleCreateRoomAsync(request, connectionId, clientMessage, cancellationToken).ConfigureAwait(false);
+                    return await HandleCreateRoomRequest(request, connectionId, clientMessage, cancellationToken).ConfigureAwait(false);
                 case WebSocketRequestTypes.JoinRoom:
-                    return await HandleJoinRoomAsync(request, connectionId, clientMessage, cancellationToken).ConfigureAwait(false);
+                    return await HandleJoinRoomRequest(request, connectionId, clientMessage, cancellationToken).ConfigureAwait(false);
                 case WebSocketRequestTypes.SendVote:
-                    return await HandleVoteAsync(request, connectionId, clientMessage, cancellationToken).ConfigureAwait(false);
+                    return await HandleSendVoteRequest(request, connectionId, clientMessage, cancellationToken).ConfigureAwait(false);
                 case WebSocketRequestTypes.RevealVotes:
-                    return await HandleRevealAsync(request, connectionId, cancellationToken).ConfigureAwait(false);
+                    return await HandleRevealVotesRequest(request, connectionId, cancellationToken).ConfigureAwait(false);
                 case WebSocketRequestTypes.ResetRound:
-                    return await HandleResetAsync(request, connectionId, cancellationToken).ConfigureAwait(false);
+                    return await HandleResetRoundRequest(request, connectionId, cancellationToken).ConfigureAwait(false);
                 default:
                     await SendErrorAsync(request, connectionId, $"Unknown action: {clientMessage.Action}.", cancellationToken)
                         .ConfigureAwait(false);
@@ -112,7 +112,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         }
     }
 
-    private async Task<APIGatewayProxyResponse> HandleCreateRoomAsync(
+    private async Task<APIGatewayProxyResponse> HandleCreateRoomRequest(
         APIGatewayProxyRequest request,
         string connectionId,
         ClientMessage clientMessage,
@@ -143,7 +143,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         return EmptySuccessResponse();
     }
 
-    private async Task<APIGatewayProxyResponse> HandleJoinRoomAsync(
+    private async Task<APIGatewayProxyResponse> HandleJoinRoomRequest(
         APIGatewayProxyRequest request,
         string connectionId,
         ClientMessage clientMessage,
@@ -187,7 +187,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         return EmptySuccessResponse();
     }
 
-    private async Task<APIGatewayProxyResponse> HandleVoteAsync(
+    private async Task<APIGatewayProxyResponse> HandleSendVoteRequest(
         APIGatewayProxyRequest request,
         string connectionId,
         ClientMessage clientMessage,
@@ -220,7 +220,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         return EmptySuccessResponse();
     }
 
-    private async Task<APIGatewayProxyResponse> HandleRevealAsync(APIGatewayProxyRequest request, string connectionId, CancellationToken cancellationToken)
+    private async Task<APIGatewayProxyResponse> HandleRevealVotesRequest(APIGatewayProxyRequest request, string connectionId, CancellationToken cancellationToken)
     {
         var state = await _roomService.RevealAsync(connectionId, cancellationToken).ConfigureAwait(false);
         if (state == null)
@@ -239,7 +239,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         return EmptySuccessResponse();
     }
 
-    private async Task<APIGatewayProxyResponse> HandleResetAsync(APIGatewayProxyRequest request, string connectionId, CancellationToken cancellationToken)
+    private async Task<APIGatewayProxyResponse> HandleResetRoundRequest(APIGatewayProxyRequest request, string connectionId, CancellationToken cancellationToken)
     {
         var state = await _roomService.ResetRoundAsync(connectionId, cancellationToken).ConfigureAwait(false);
         if (state == null)
