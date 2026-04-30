@@ -27,7 +27,7 @@ public static class LambdaStartup
 
     public static void ConfigureServices(IServiceCollection services, string connectionString)
     {
-        services.AddDbContext<AppDbContext>(options =>
+        services.AddDbContext<AppDatabaseContext>(options =>
             options.UseNpgsql(connectionString));
         services.AddScoped<IRoomRepository, RoomRepository>();
         services.AddScoped<IRoomCodeAllocator, RoomCodeAllocator>();

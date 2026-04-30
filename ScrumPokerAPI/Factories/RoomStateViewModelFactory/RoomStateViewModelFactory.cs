@@ -11,12 +11,12 @@ public sealed class RoomStateViewModelFactory : IRoomStateViewModelFactory
         return new RoomStateDto
         {
             RoomCode = room.Code,
-            Revealed = room.Revealed,
+            IsRevealed = room.IsRevealed,
             Participants = participants.Select(participant => new ParticipantStateDto
             {
                 DisplayName = participant.DisplayName,
-                HasVoted = !string.IsNullOrEmpty(participant.VoteValue),
-                Vote = room.Revealed ? participant.VoteValue : null,
+                HasVoted = !string.IsNullOrEmpty(participant.Vote),
+                Vote = room.IsRevealed ? participant.Vote : null,
             }).ToList(),
         };
     }

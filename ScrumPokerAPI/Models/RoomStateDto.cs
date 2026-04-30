@@ -6,7 +6,7 @@ public class RoomStateDto
 {
 	public string RoomCode { get; set; } = string.Empty;
 
-	public bool Revealed { get; set; }
+	public bool IsRevealed { get; set; }
 
 	public List<ParticipantStateDto> Participants { get; set; } = new();
 }

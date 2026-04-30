@@ -12,11 +12,11 @@ public class Participant
 
     public string DisplayName { get; private set; } = string.Empty;
 
-    public string? VoteValue { get; private set; }
+    public string? Vote { get; private set; }
 
-    private Participant()
-    {
-    }
+    // private Participant()
+    // {
+    // }
 
     internal static Participant CreateForRoom(Guid id, Room room, string connectionId, string displayName)
     {
@@ -27,17 +27,17 @@ public class Participant
             Room = room,
             ConnectionId = connectionId,
             DisplayName = displayName,
-            VoteValue = null,
+            Vote = null,
         };
     }
 
     public void RecordVote(string value)
     {
-        VoteValue = value.Trim();
+        Vote = value.Trim();
     }
 
     public void ClearVote()
     {
-        VoteValue = null;
+        Vote = null;
     }
 }

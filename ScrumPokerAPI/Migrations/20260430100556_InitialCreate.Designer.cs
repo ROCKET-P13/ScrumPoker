@@ -11,8 +11,8 @@ using ScrumPokerAPI.Data;
 
 namespace ScrumPokerAPI.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
-    [Migration("20260429140358_InitialCreate")]
+    [DbContext(typeof(AppDatabaseContext))]
+    [Migration("20260430100556_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -29,24 +29,29 @@ namespace ScrumPokerAPI.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("ConnectionId")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("connection_id");
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("display_name");
 
                     b.Property<Guid>("RoomId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("room_id");
 
-                    b.Property<string>("VoteValue")
+                    b.Property<string>("Vote")
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("vote");
 
                     b.HasKey("Id");
 
@@ -55,32 +60,36 @@ namespace ScrumPokerAPI.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("Participants");
+                    b.ToTable("Participants", (string)null);
                 });
 
             modelBuilder.Entity("ScrumPokerAPI.Domain.Entities.Room", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("code");
 
-                    b.Property<DateTimeOffset>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
 
-                    b.Property<bool>("Revealed")
-                        .HasColumnType("boolean");
+                    b.Property<bool>("IsRevealed")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_revealed");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Rooms", (string)null);
                 });
 
             modelBuilder.Entity("ScrumPokerAPI.Domain.Entities.Participant", b =>

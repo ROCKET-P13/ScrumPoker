@@ -15,52 +15,52 @@ namespace ScrumPokerAPI.Migrations
                 name: "Rooms",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Code = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    Revealed = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAtUtc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    code = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    is_revealed = table.Column<bool>(type: "boolean", nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Rooms", x => x.Id);
+                    table.PrimaryKey("PK_Rooms", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Participants",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    RoomId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ConnectionId = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    DisplayName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    VoteValue = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true)
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    room_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    connection_id = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    display_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    vote = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Participants", x => x.Id);
+                    table.PrimaryKey("PK_Participants", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Participants_Rooms_RoomId",
-                        column: x => x.RoomId,
+                        name: "FK_Participants_Rooms_room_id",
+                        column: x => x.room_id,
                         principalTable: "Rooms",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Participants_ConnectionId",
+                name: "IX_Participants_connection_id",
                 table: "Participants",
-                column: "ConnectionId",
+                column: "connection_id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Participants_RoomId",
+                name: "IX_Participants_room_id",
                 table: "Participants",
-                column: "RoomId");
+                column: "room_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rooms_Code",
+                name: "IX_Rooms_code",
                 table: "Rooms",
-                column: "Code",
+                column: "code",
                 unique: true);
         }
 

@@ -26,7 +26,7 @@ public static class LocalStartup
 {
     private const string LocalDevSection = "LocalDev";
 
-    public static void ConfigureWebApplication(WebApplicationBuilder builder, LocalWebSocketHub hub)
+    public static void ConfigureWebApplication(WebApplicationBuilder builder, LocalWebSocketHub webSocketHub)
     {
         var configuration = builder.Configuration;
         var listenUrls = configuration[$"{LocalDevSection}:Urls"] ?? "http://localhost:5046";
@@ -36,9 +36,11 @@ public static class LocalStartup
             ?? throw new InvalidOperationException(
                 "Set ConnectionStrings:DefaultConnection (env: ConnectionStrings__DefaultConnection) for local development.");
 
-        builder.Services.AddSingleton(hub);
-        builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(connectionString));
+        builder.Services.AddSingleton(webSocketHub);
+        builder.Services.AddDbContext<AppDatabaseContext>(options =>
+            options.UseNpgsql(connectionString)
+		);
+
         builder.Services.AddScoped<IRoomRepository, RoomRepository>();
         builder.Services.AddScoped<IRoomCodeAllocator, RoomCodeAllocator>();
         builder.Services.AddScoped<IRoomFactory, RoomFactory>();
@@ -53,7 +55,7 @@ public static class LocalStartup
         });
     }
 
-    public static void MapLocalWebSocket(WebApplication application, LocalWebSocketHub hub)
+    public static void MapLocalWebSocket(WebApplication application, LocalWebSocketHub webSocketHub)
     {
         var configuration = application.Configuration;
         var section = configuration.GetSection(LocalDevSection);
@@ -61,7 +63,7 @@ public static class LocalStartup
         if (string.IsNullOrEmpty(path))
             path = "/ws";
 
-        var mockDomain = section["MockApiGatewayDomainName"] ?? "localhost:5007";
+        var mockDomain = section["MockApiGatewayDomainName"] ?? "localhost:5046";
         var mockStage = section["MockApiGatewayStage"] ?? "local";
 
         application.MapGet("/", () => Results.Text(
@@ -80,15 +82,23 @@ public static class LocalStartup
             var lifetime = httpContext.RequestServices.GetRequiredService<IHostApplicationLifetime>();
             using var shutdownLinked = CancellationTokenSource.CreateLinkedTokenSource(
                 httpContext.RequestAborted,
-                lifetime.ApplicationStopping);
+                lifetime.ApplicationStopping
+			);
+
             var connectionLifetime = shutdownLinked.Token;
 
             var webSocket = await httpContext.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);
             var connectionId = Guid.NewGuid().ToString("N");
-            hub.Register(connectionId, webSocket);
+            webSocketHub.Register(connectionId, webSocket);
 
             var connectEvent = LocalApiGatewayRequestBuilder.Create(
-                connectionId, "$connect", null, mockDomain, mockStage);
+                connectionId,
+				"$connect",
+				null,
+				mockDomain,
+				mockStage
+			);
+
             await using (var scope = scopeFactory.CreateAsyncScope())
             {
                 var webSocketRequestHandler = scope.ServiceProvider.GetRequiredService<WebSocketRequestHandler>();
@@ -138,7 +148,7 @@ public static class LocalStartup
             }
             finally
             {
-                hub.Remove(connectionId);
+                webSocketHub.Remove(connectionId);
                 var disconnectEvent = LocalApiGatewayRequestBuilder.Create(
                     connectionId, "$disconnect", null, mockDomain, mockStage);
                 await using (var scope = scopeFactory.CreateAsyncScope())

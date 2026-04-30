@@ -3,30 +3,49 @@ using ScrumPokerAPI.Domain.Entities;
 
 namespace ScrumPokerAPI.Data;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : DbContext(options)
 {
-    public DbSet<Room> Rooms => Set<Room>();
-    public DbSet<Participant> Participants => Set<Participant>();
+    public DbSet<Room> Rooms { get; set; }
+    public DbSet<Participant> Participants { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Room>(roomEntity =>
+        modelBuilder.Entity<Room>(entity =>
         {
-            roomEntity.HasKey(room => room.Id);
-            roomEntity.HasIndex(room => room.Code).IsUnique();
-            roomEntity.Property(room => room.Code).HasMaxLength(32).IsRequired();
+			entity.ToTable("Rooms");
+			entity.Property(e => e.Id).HasColumnName("id");
+			entity.Property(e => e.Code).HasColumnName("code");
+			entity.Property(e => e.IsRevealed).HasColumnName("is_revealed");
+			entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+
+			entity.HasMany(e => e.Participants)
+				.WithOne()
+				.HasForeignKey(p => p.RoomId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasKey(room => room.Id);
+            entity.HasIndex(room => room.Code).IsUnique();
+            entity.Property(room => room.Code).HasMaxLength(32).IsRequired();
         });
 
-        modelBuilder.Entity<Participant>(participantEntity =>
+        modelBuilder.Entity<Participant>(entity =>
         {
-            participantEntity.HasKey(participant => participant.Id);
-            participantEntity.HasIndex(participant => participant.ConnectionId).IsUnique();
-            participantEntity.Property(participant => participant.ConnectionId).HasMaxLength(128).IsRequired();
-            participantEntity.Property(participant => participant.DisplayName).HasMaxLength(256).IsRequired();
-            participantEntity.Property(participant => participant.VoteValue).HasMaxLength(32);
-            participantEntity.HasOne(participant => participant.Room)
-                .WithMany(room => room.Participants)
-                .HasForeignKey(participant => participant.RoomId)
+			entity.ToTable("Participants");
+			entity.Property(e => e.Id).HasColumnName("id");
+			entity.Property(e => e.RoomId).HasColumnName("room_id");
+			entity.Property(e => e.ConnectionId).HasColumnName("connection_id");
+			entity.Property(e => e.DisplayName).HasColumnName("display_name");
+			entity.Property(e => e.Vote).HasColumnName("vote");
+
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.ConnectionId).IsUnique();
+            entity.Property(e => e.ConnectionId).HasMaxLength(128).IsRequired();
+            entity.Property(e => e.DisplayName).HasMaxLength(256).IsRequired();
+            entity.Property(e => e.Vote).HasMaxLength(32);
+            
+			entity.HasOne(e => e.Room)
+                .WithMany(r => r.Participants)
+                .HasForeignKey(e => e.RoomId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

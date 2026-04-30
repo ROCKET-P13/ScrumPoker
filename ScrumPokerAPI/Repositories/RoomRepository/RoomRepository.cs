@@ -5,9 +5,9 @@ using ScrumPokerAPI.Repositories.RoomRepository.Interfaces;
 
 namespace ScrumPokerAPI.Repositories.RoomRepository;
 
-public sealed class RoomRepository(AppDbContext databaseContext) : IRoomRepository
+public sealed class RoomRepository(AppDatabaseContext databaseContext) : IRoomRepository
 {
-    private readonly AppDbContext _databaseContext = databaseContext;
+    private readonly AppDatabaseContext _databaseContext = databaseContext;
 
     public Task<bool> IsRoomCodeAllocatedAsync(string code, CancellationToken cancellationToken)
     {

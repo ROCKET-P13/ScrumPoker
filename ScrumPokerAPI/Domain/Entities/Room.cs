@@ -6,9 +6,9 @@ public class Room
 
     public string Code { get; private set; } = string.Empty;
 
-    public bool Revealed { get; private set; }
+    public bool IsRevealed { get; private set; }
 
-    public DateTimeOffset CreatedAtUtc { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
 
     public ICollection<Participant> Participants { get; private set; } = new List<Participant>();
 
@@ -22,8 +22,8 @@ public class Room
         {
             Id = Guid.NewGuid(),
             Code = code,
-            Revealed = false,
-            CreatedAtUtc = DateTimeOffset.UtcNow,
+            IsRevealed = false,
+            CreatedAt = DateTimeOffset.UtcNow,
             Participants = new List<Participant>(),
         };
     }
@@ -37,12 +37,12 @@ public class Room
 
     public void RevealVotes()
     {
-        Revealed = true;
+        IsRevealed = true;
     }
 
     public void ResetRound()
     {
-        Revealed = false;
+        IsRevealed = false;
         foreach (var participant in Participants)
             participant.ClearVote();
     }
