@@ -10,19 +10,21 @@ public class Room
 
     public DateTimeOffset CreatedAt { get; set; }
 
-    public ICollection<Participant> Participants { get; private set; } = [];
+    public ICollection<Participant> Participants { get; private set; } = new List<Participant>();
 
     public Participant AddParticipant(Participant participant)
     {
-        participant.RoomId = Id;
-        participant.Room = this;
         Participants.Add(participant);
         return participant;
     }
 
     public void RemoveParticipant(Participant participant)
     {
-        Participants.Remove(participant);
+        ArgumentNullException.ThrowIfNull(participant);
+        if (participant.RoomId != Id)
+            throw new InvalidOperationException("Participant does not belong to this room.");
+        if (!Participants.Remove(participant))
+            throw new InvalidOperationException("Participant is not a member of this room.");
     }
 
     public void RevealVotes()

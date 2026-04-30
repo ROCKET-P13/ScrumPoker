@@ -9,8 +9,6 @@ using ScrumPokerAPI.Factories.RoomFactory;
 using ScrumPokerAPI.Factories.RoomFactory.Interfaces;
 using ScrumPokerAPI.Factories.RoomStateViewModelFactory;
 using ScrumPokerAPI.Factories.RoomStateViewModelFactory.Interfaces;
-using ScrumPokerAPI.Repositories.ParticipantRepository;
-using ScrumPokerAPI.Repositories.ParticipantRepository.Interfaces;
 using ScrumPokerAPI.Repositories.RoomRepository;
 using ScrumPokerAPI.Repositories.RoomRepository.Interfaces;
 using ScrumPokerAPI.Services.BroadcastService;
@@ -49,7 +47,6 @@ public static class LocalStartup
 		);
 
         builder.Services.AddScoped<IRoomRepository, RoomRepository>();
-        builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         builder.Services.AddScoped<IRoomFinder, RoomFinder>();
         builder.Services.AddScoped<IParticipantFinder, ParticipantFinder>();

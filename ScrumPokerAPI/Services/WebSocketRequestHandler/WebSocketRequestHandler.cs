@@ -116,7 +116,8 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         APIGatewayProxyRequest request,
         string connectionId,
         ClientMessage clientMessage,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+	)
     {
         var trimmedDisplayName = clientMessage.DisplayName?.Trim() ?? string.Empty;
         if (trimmedDisplayName.Length == 0)
@@ -150,7 +151,8 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         APIGatewayProxyRequest request,
         string connectionId,
         ClientMessage clientMessage,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+	)
     {
         var normalizedRoomCode = clientMessage.RoomCode?.Trim() ?? string.Empty;
         var trimmedDisplayName = clientMessage.DisplayName?.Trim() ?? string.Empty;
@@ -194,7 +196,8 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         APIGatewayProxyRequest request,
         string connectionId,
         ClientMessage clientMessage,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+	)
     {
         var trimmedVoteValue = clientMessage.Value?.Trim() ?? string.Empty;
         if (trimmedVoteValue.Length == 0)
@@ -268,7 +271,8 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         APIGatewayProxyRequest request,
         string connectionId,
         string errorMessage,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+	)
     {
         return _broadcastService.SendToConnectionAsync(
 			request,

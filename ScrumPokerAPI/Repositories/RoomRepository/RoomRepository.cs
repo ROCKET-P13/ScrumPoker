@@ -17,9 +17,32 @@ public sealed class RoomRepository(AppDatabaseContext databaseContext) : IRoomRe
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    public Task<Room?> FindByCode(string roomCode, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(roomCode);
+
+        return _databaseContext.Rooms
+            .Where(room => room.Code == roomCode)
+            .Include(room => room.Participants)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public void Upsert(Room room)
     {
-        _databaseContext.Rooms.Add(room);
+        ArgumentNullException.ThrowIfNull(room);
+
+        var roomEntry = _databaseContext.Entry(room);
+        if (roomEntry.State == EntityState.Detached)
+        {
+            _databaseContext.Rooms.Add(room);
+            return;
+        }
+
+        foreach (var participant in room.Participants)
+        {
+            if (_databaseContext.Entry(participant).State == EntityState.Modified)
+                _databaseContext.Participants.Add(participant);
+        }
     }
 
     public void Remove(Room room)

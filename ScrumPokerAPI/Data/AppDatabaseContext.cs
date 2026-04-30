@@ -21,6 +21,11 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
             entity.HasKey(room => room.Id);
             entity.HasIndex(room => room.Code).IsUnique();
             entity.Property(room => room.Code).HasMaxLength(32).IsRequired();
+
+            entity.HasMany(room => room.Participants)
+				.WithOne()
+                .HasForeignKey(participant => participant.RoomId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Participant>(entity =>
@@ -38,11 +43,6 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
             entity.Property(e => e.ConnectionId).HasMaxLength(128).IsRequired();
             entity.Property(e => e.DisplayName).HasMaxLength(256).IsRequired();
             entity.Property(e => e.Vote).HasMaxLength(32);
-            
-			entity.HasOne(e => e.Room)
-                .WithMany(r => r.Participants)
-                .HasForeignKey(e => e.RoomId)
-                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

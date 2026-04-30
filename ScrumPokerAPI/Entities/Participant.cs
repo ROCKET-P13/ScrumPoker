@@ -6,8 +6,6 @@ public class Participant
 
     public Guid RoomId { get; set; }
 
-    public Room Room { get; set; } = null!;
-
     public string ConnectionId { get; set; } = string.Empty;
 
     public string DisplayName { get; set; } = string.Empty;

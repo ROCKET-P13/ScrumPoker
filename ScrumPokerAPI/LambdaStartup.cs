@@ -10,8 +10,6 @@ using ScrumPokerAPI.Factories.RoomFactory;
 using ScrumPokerAPI.Factories.RoomFactory.Interfaces;
 using ScrumPokerAPI.Factories.RoomStateViewModelFactory;
 using ScrumPokerAPI.Factories.RoomStateViewModelFactory.Interfaces;
-using ScrumPokerAPI.Repositories.ParticipantRepository;
-using ScrumPokerAPI.Repositories.ParticipantRepository.Interfaces;
 using ScrumPokerAPI.Repositories.RoomRepository;
 using ScrumPokerAPI.Repositories.RoomRepository.Interfaces;
 using ScrumPokerAPI.Services.BroadcastService;
@@ -37,7 +35,6 @@ public static class LambdaStartup
         services.AddDbContext<AppDatabaseContext>(options =>
             options.UseNpgsql(connectionString));
         services.AddScoped<IRoomRepository, RoomRepository>();
-        services.AddScoped<IParticipantRepository, ParticipantRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IRoomFinder, RoomFinder>();
         services.AddScoped<IParticipantFinder, ParticipantFinder>();
