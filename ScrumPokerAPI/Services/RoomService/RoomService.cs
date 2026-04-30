@@ -49,7 +49,7 @@ public sealed class RoomService(
 
         room.AddParticipant(participant);
 
-        _roomRepository.Add(room);
+        _roomRepository.Upsert(room);
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return await ToRoomStateAsync(room.Id, cancellationToken).ConfigureAwait(false);
@@ -66,19 +66,20 @@ public sealed class RoomService(
         if (roomForLookup == null)
             return null;
 
-        var existingSameConnection = await _participantRepository.Participants
+        var existingConnection = await _participantRepository.Participants
             .FirstOrDefaultAsync(participant => participant.ConnectionId == connectionId, cancellationToken)
             .ConfigureAwait(false);
-        if (existingSameConnection != null)
+
+        if (existingConnection != null)
         {
-            if (existingSameConnection.RoomId == roomForLookup.Id)
+            if (existingConnection.RoomId == roomForLookup.Id)
             {
-                existingSameConnection.UpdateDisplayName(dto.DisplayName);
+                existingConnection.UpdateDisplayName(dto.DisplayName);
                 await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                 return await ToRoomStateAsync(roomForLookup.Id, cancellationToken).ConfigureAwait(false);
             }
 
-            _participantRepository.Remove(existingSameConnection);
+            _participantRepository.Remove(existingConnection);
         }
 
         var newParticipant = _participantFactory.FromDto(

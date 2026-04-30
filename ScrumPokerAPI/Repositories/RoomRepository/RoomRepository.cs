@@ -17,7 +17,7 @@ public sealed class RoomRepository(AppDatabaseContext databaseContext) : IRoomRe
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public void Add(Room room)
+    public void Upsert(Room room)
     {
         _databaseContext.Rooms.Add(room);
     }
