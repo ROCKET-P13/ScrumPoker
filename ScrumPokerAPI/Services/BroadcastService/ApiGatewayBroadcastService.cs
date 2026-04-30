@@ -42,7 +42,9 @@ public sealed class ApiGatewayBroadcastService : IBroadcastService
                         ConnectionId = connectionId,
                         Data = new MemoryStream(bytes),
                     },
-                    cancellationToken).ConfigureAwait(false);
+                    cancellationToken
+				)
+				.ConfigureAwait(false);
             }
             catch (AmazonServiceException exception) when (exception.StatusCode == HttpStatusCode.Gone)
             {
