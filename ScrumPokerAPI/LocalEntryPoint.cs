@@ -1,4 +1,4 @@
-using ScrumPokerAPI.Services.WebSocketHub;
+using ScrumPokerAPI.Services.LocalWebSocketHub;
 
 namespace ScrumPokerAPI;
 
