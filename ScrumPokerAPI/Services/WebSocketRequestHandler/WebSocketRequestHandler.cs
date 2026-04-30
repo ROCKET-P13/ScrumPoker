@@ -30,25 +30,25 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         return Task.FromResult(EmptySuccessResponse());
     }
 
-    private async Task<APIGatewayProxyResponse> HandleDisconnectAsync(APIGatewayProxyRequest request, CancellationToken cancellationToken)
+    private async Task<APIGatewayProxyResponse> HandleDisconnectAsync(APIGatewayProxyRequest request, CancellationToken _)
     {
         var connectionId = request.RequestContext.ConnectionId;
         if (string.IsNullOrEmpty(connectionId))
             return EmptySuccessResponse();
-
+		
         try
         {
-            var roomId = await _roomService.RemoveConnectionAsync(connectionId, cancellationToken).ConfigureAwait(false);
+            var roomId = await _roomService.RemoveConnectionAsync(connectionId, CancellationToken.None).ConfigureAwait(false);
             if (roomId == null)
                 return EmptySuccessResponse();
 
-            var targets = await _roomService.GetConnectionIdsForRoomAsync(roomId.Value, cancellationToken).ConfigureAwait(false);
+            var targets = await _roomService.GetConnectionIdsForRoomAsync(roomId.Value, CancellationToken.None).ConfigureAwait(false);
             if (targets.Count == 0)
                 return EmptySuccessResponse();
 
-            var state = await _roomService.GetRoomStateAsync(roomId.Value, cancellationToken).ConfigureAwait(false);
+            var state = await _roomService.GetRoomStateAsync(roomId.Value, CancellationToken.None).ConfigureAwait(false);
             if (state != null)
-                await _broadcastService.BroadcastRoomState(request, targets, state, cancellationToken).ConfigureAwait(false);
+                await _broadcastService.BroadcastRoomState(request, targets, state, CancellationToken.None).ConfigureAwait(false);
 
             return EmptySuccessResponse();
         }
