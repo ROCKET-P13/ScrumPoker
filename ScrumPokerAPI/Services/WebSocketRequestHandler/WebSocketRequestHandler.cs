@@ -128,7 +128,10 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         var state = await _roomService.CreateRoomAsync(
             connectionId,
             new CreateRoomRequestDto { DisplayName = trimmedDisplayName },
-            cancellationToken).ConfigureAwait(false);
+            cancellationToken
+			)
+			.ConfigureAwait(false);
+
         var roomId = await _roomService.GetRoomIdForConnectionAsync(connectionId, cancellationToken).ConfigureAwait(false);
         if (roomId == null)
         {
