@@ -19,7 +19,7 @@ public sealed class LocalBroadcastService(ILocalWebSocketHub webSocketHub) : IBr
     {
         var payload = new
         {
-            type = "roomState",
+            type = "ROOM_STATE",
             data = state,
         };
         var bytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(payload, AppJsonSerializerOptions.ApplicationDefault)).AsMemory();

@@ -27,7 +27,7 @@ public sealed class ApiGatewayBroadcastService : IBroadcastService
 
         var payload = new
         {
-            type = "roomState",
+            type = "ROOM_STATE",
             data = state,
         };
         var bytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(payload, AppJsonSerializerOptions.ApplicationDefault));
