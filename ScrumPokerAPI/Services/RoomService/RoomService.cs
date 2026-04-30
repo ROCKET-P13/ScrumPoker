@@ -186,6 +186,7 @@ public sealed class RoomService(
     {
         var room = await _roomRepository.FindById(roomId, cancellationToken)
             .ConfigureAwait(false);
+
         if (room == null)
             return;
 
