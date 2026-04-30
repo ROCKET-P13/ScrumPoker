@@ -204,9 +204,12 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
         }
 
         var state = await _roomService.VoteAsync(
-            connectionId,
-            new VoteRequestDto { Value = trimmedVoteValue },
-            cancellationToken).ConfigureAwait(false);
+				connectionId,
+				new VoteRequestDto { Value = trimmedVoteValue },
+				cancellationToken
+			)
+			.ConfigureAwait(false);
+
         if (state == null)
         {
             await SendErrorAsync(request, connectionId, "Not in a room.", cancellationToken).ConfigureAwait(false);
