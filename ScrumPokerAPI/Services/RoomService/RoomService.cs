@@ -96,7 +96,7 @@ public sealed class RoomService(
         return await ToRoomStateAsync(roomForLookup.Id, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<RoomStateDTO?> VoteAsync(string connectionId, VoteRequestDto dto, CancellationToken cancellationToken)
+    public async Task<RoomStateDTO?> CaptureVote(string connectionId, VoteRequestDto dto, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(dto);
 

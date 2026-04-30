@@ -203,7 +203,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
             return EmptySuccessResponse();
         }
 
-        var state = await _roomService.VoteAsync(
+        var state = await _roomService.CaptureVote(
 				connectionId,
 				new VoteRequestDto { Value = trimmedVoteValue },
 				cancellationToken

@@ -9,7 +9,7 @@ public interface IRoomService
 
     Task<RoomStateDTO?> JoinRoom(string connectionId, JoinRoomRequestDto dto, CancellationToken cancellationToken);
 
-    Task<RoomStateDTO?> VoteAsync(string connectionId, VoteRequestDto dto, CancellationToken cancellationToken);
+    Task<RoomStateDTO?> CaptureVote(string connectionId, VoteRequestDto dto, CancellationToken cancellationToken);
 
     Task<RoomStateDTO?> RevealAsync(string connectionId, CancellationToken cancellationToken);
 
