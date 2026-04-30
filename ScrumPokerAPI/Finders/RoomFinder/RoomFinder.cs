@@ -9,19 +9,23 @@ public sealed class RoomFinder(AppDatabaseContext databaseContext) : IRoomFinder
 {
     private readonly AppDatabaseContext _databaseContext = databaseContext;
 
-    public Task<Room?> FindByIdAsync(Guid roomId, bool includeParticipants, CancellationToken cancellationToken)
+    public Task<Room?> FindById(Guid roomId, CancellationToken cancellationToken)
     {
-        var query = _databaseContext.Rooms.AsNoTracking().Where(room => room.Id == roomId);
-        query = includeParticipants ? query.Include(room => room.Participants) : query;
-        return query.FirstOrDefaultAsync(cancellationToken);
+        return _databaseContext.Rooms
+			.AsNoTracking()
+			.Where(room => room.Id == roomId)
+			.Include(room => room.Participants)
+			.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public Task<Room?> FindByCodeAsync(string normalizedRoomCode, bool includeParticipants, CancellationToken cancellationToken)
+    public Task<Room?> FindByCode(string normalizedRoomCode, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(normalizedRoomCode);
-        var query = _databaseContext.Rooms.AsNoTracking().Where(room => room.Code == normalizedRoomCode);
-        query = includeParticipants ? query.Include(room => room.Participants) : query;
-        return query.FirstOrDefaultAsync(cancellationToken);
+
+        return _databaseContext.Rooms
+			.AsNoTracking()
+			.Where(room => room.Code == normalizedRoomCode)
+			.FirstOrDefaultAsync(cancellationToken);
     }
 
     public Task<bool> AnyWithCodeAsync(string code, CancellationToken cancellationToken)
