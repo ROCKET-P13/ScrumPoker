@@ -16,6 +16,7 @@ using ScrumPokerAPI.Repositories.RoomRepository.Interfaces;
 using ScrumPokerAPI.Services.BroadcastService;
 using ScrumPokerAPI.Services.BroadcastService.Interfaces;
 using ScrumPokerAPI.Services.LocalWebSocketHub;
+using ScrumPokerAPI.Services.LocalWebSocketHub.Interfaces;
 using ScrumPokerAPI.Services.RoomService;
 using ScrumPokerAPI.Services.RoomService.Interfaces;
 using ScrumPokerAPI.Services.WebSocketRequestHandler;
@@ -26,7 +27,7 @@ public static class LocalStartup
 {
     private const string LocalDevSection = "LocalDev";
 
-    public static void ConfigureWebApplication(WebApplicationBuilder builder, LocalWebSocketHub webSocketHub)
+    public static void ConfigureWebApplication(WebApplicationBuilder builder, ILocalWebSocketHub webSocketHub)
     {
         var configuration = builder.Configuration;
         var listenUrls = configuration[$"{LocalDevSection}:Urls"] ?? "http://localhost:5046";
