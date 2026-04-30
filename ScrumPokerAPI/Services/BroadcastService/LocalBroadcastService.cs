@@ -4,13 +4,13 @@ using Amazon.Lambda.APIGatewayEvents;
 using ScrumPokerAPI.Models;
 using ScrumPokerAPI.Serialization;
 using ScrumPokerAPI.Services.BroadcastService.Interfaces;
-using ScrumPokerAPI.Services.WebSocketHub;
+using ScrumPokerAPI.Services.LocalWebSocketHub.Interfaces;
 
 namespace ScrumPokerAPI.Services.BroadcastService;
 
-public sealed class LocalBroadcastService(LocalWebSocketHub webSocketHub) : IBroadcastService
+public sealed class LocalBroadcastService(ILocalWebSocketHub webSocketHub) : IBroadcastService
 {
-	private readonly LocalWebSocketHub _webSocketHub =  webSocketHub;
+	private readonly ILocalWebSocketHub _webSocketHub =  webSocketHub;
     public async Task BroadcastRoomStateAsync(
         APIGatewayProxyRequest request,
         IReadOnlyList<string> connectionIds,

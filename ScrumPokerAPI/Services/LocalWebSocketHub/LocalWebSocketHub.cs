@@ -1,9 +1,10 @@
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
+using ScrumPokerAPI.Services.LocalWebSocketHub.Interfaces;
 
 namespace ScrumPokerAPI.Services.LocalWebSocketHub;
 
-public sealed class LocalWebSocketHub
+public sealed class LocalWebSocketHub : ILocalWebSocketHub
 {
     private readonly ConcurrentDictionary<string, WebSocket> _connections = new();
 
