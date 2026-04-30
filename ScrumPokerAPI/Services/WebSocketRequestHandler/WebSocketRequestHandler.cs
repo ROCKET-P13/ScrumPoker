@@ -127,7 +127,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 
         var state = await _roomService.CreateRoomAsync(
             connectionId,
-            new CreateRoomRequestDto { DisplayName = trimmedDisplayName },
+            new CreateRoomRequestDTO { DisplayName = trimmedDisplayName },
             cancellationToken
 			)
 			.ConfigureAwait(false);
@@ -163,7 +163,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 
         var state = await _roomService.JoinRoom(
             connectionId,
-            new JoinRoomRequestDto
+            new JoinRoomRequestDTO
 			{
 				RoomCode = normalizedRoomCode,
 				DisplayName = trimmedDisplayName
@@ -205,7 +205,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 
         var state = await _roomService.CaptureVote(
 				connectionId,
-				new VoteRequestDto { Value = trimmedVoteValue },
+				new VoteRequestDTO { Value = trimmedVoteValue },
 				cancellationToken
 			)
 			.ConfigureAwait(false);

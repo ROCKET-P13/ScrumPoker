@@ -8,7 +8,7 @@ public interface IBroadcastService
     Task BroadcastRoomState(
         APIGatewayProxyRequest request,
         IReadOnlyList<string> connectionIds,
-        RoomStateDTO state,
+        RoomStateViewModel state,
         CancellationToken cancellationToken);
 
     Task SendToConnectionAsync(

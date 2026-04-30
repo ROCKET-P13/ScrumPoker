@@ -1,10 +1,10 @@
 namespace ScrumPokerAPI.Models;
 
-public class RoomStateDTO
+public class RoomStateViewModel
 {
 	public string RoomCode { get; set; } = string.Empty;
 
 	public bool IsRevealed { get; set; }
 
-	public List<ParticipantStateDTO> Participants { get; set; } = [];
+	public List<ParticipantViewModel> Participants { get; set; } = [];
 }

@@ -1,6 +1,6 @@
 namespace ScrumPokerAPI.Models.Requests;
 
-public sealed class JoinRoomRequestDto
+public sealed class JoinRoomRequestDTO
 {
     public string RoomCode { get; set; } = string.Empty;
 

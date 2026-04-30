@@ -14,7 +14,7 @@ public sealed class LocalBroadcastService(ILocalWebSocketHub webSocketHub) : IBr
     public async Task BroadcastRoomState(
         APIGatewayProxyRequest request,
         IReadOnlyList<string> connectionIds,
-        RoomStateDTO state,
+        RoomStateViewModel state,
         CancellationToken cancellationToken)
     {
         var payload = new

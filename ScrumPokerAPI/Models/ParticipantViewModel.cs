@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ScrumPokerAPI.Models;
 
-public class ParticipantStateDTO
+public class ParticipantViewModel
 {
 	public string DisplayName { get; set; } = string.Empty;
 

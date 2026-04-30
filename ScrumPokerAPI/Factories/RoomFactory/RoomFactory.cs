@@ -9,7 +9,7 @@ public sealed class RoomFactory(IRoomCodeAllocator roomCodeAllocator) : IRoomFac
 {
     private readonly IRoomCodeAllocator _roomCodeAllocator = roomCodeAllocator;
 
-    public async Task<Room> FromDtos(CreateRoomRequestDto dto, string connectionId, CancellationToken cancellationToken)
+    public async Task<Room> FromDtos(CreateRoomRequestDTO dto, string connectionId, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(dto);
 

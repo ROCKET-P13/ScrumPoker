@@ -5,15 +5,15 @@ namespace ScrumPokerAPI.Services.RoomService.Interfaces;
 
 public interface IRoomService
 {
-    Task<RoomStateDTO> CreateRoomAsync(string connectionId, CreateRoomRequestDto dto, CancellationToken cancellationToken);
+    Task<RoomStateViewModel> CreateRoomAsync(string connectionId, CreateRoomRequestDTO dto, CancellationToken cancellationToken);
 
-    Task<RoomStateDTO?> JoinRoom(string connectionId, JoinRoomRequestDto dto, CancellationToken cancellationToken);
+    Task<RoomStateViewModel?> JoinRoom(string connectionId, JoinRoomRequestDTO dto, CancellationToken cancellationToken);
 
-    Task<RoomStateDTO?> CaptureVote(string connectionId, VoteRequestDto dto, CancellationToken cancellationToken);
+    Task<RoomStateViewModel?> CaptureVote(string connectionId, VoteRequestDTO dto, CancellationToken cancellationToken);
 
-    Task<RoomStateDTO?> RevealVotes(string connectionId, CancellationToken cancellationToken);
+    Task<RoomStateViewModel?> RevealVotes(string connectionId, CancellationToken cancellationToken);
 
-    Task<RoomStateDTO?> ResetRound(string connectionId, CancellationToken cancellationToken);
+    Task<RoomStateViewModel?> ResetRound(string connectionId, CancellationToken cancellationToken);
 
     Task<Guid?> RemoveConnection(string connectionId, CancellationToken cancellationToken);
 
@@ -21,5 +21,5 @@ public interface IRoomService
 
     Task<Guid?> GetRoomIdForConnection(string connectionId, CancellationToken cancellationToken);
 
-    Task<RoomStateDTO?> GetRoomState(Guid roomId, CancellationToken cancellationToken);
+    Task<RoomStateViewModel?> GetRoomState(Guid roomId, CancellationToken cancellationToken);
 }
