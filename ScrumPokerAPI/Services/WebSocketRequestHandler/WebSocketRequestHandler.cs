@@ -228,7 +228,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 
     private async Task<APIGatewayProxyResponse> HandleRevealVotesRequest(APIGatewayProxyRequest request, string connectionId, CancellationToken cancellationToken)
     {
-        var state = await _roomService.RevealAsync(connectionId, cancellationToken).ConfigureAwait(false);
+        var state = await _roomService.RevealVotes(connectionId, cancellationToken).ConfigureAwait(false);
         if (state == null)
         {
             await SendErrorAsync(request, connectionId, "Not in a room.", cancellationToken).ConfigureAwait(false);
@@ -247,7 +247,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 
     private async Task<APIGatewayProxyResponse> HandleResetRoundRequest(APIGatewayProxyRequest request, string connectionId, CancellationToken cancellationToken)
     {
-        var state = await _roomService.ResetRoundAsync(connectionId, cancellationToken).ConfigureAwait(false);
+        var state = await _roomService.ResetRound(connectionId, cancellationToken).ConfigureAwait(false);
         if (state == null)
         {
             await SendErrorAsync(request, connectionId, "Not in a room.", cancellationToken).ConfigureAwait(false);

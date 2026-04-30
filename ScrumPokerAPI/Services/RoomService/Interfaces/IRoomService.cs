@@ -11,9 +11,9 @@ public interface IRoomService
 
     Task<RoomStateDTO?> CaptureVote(string connectionId, VoteRequestDto dto, CancellationToken cancellationToken);
 
-    Task<RoomStateDTO?> RevealAsync(string connectionId, CancellationToken cancellationToken);
+    Task<RoomStateDTO?> RevealVotes(string connectionId, CancellationToken cancellationToken);
 
-    Task<RoomStateDTO?> ResetRoundAsync(string connectionId, CancellationToken cancellationToken);
+    Task<RoomStateDTO?> ResetRound(string connectionId, CancellationToken cancellationToken);
 
     Task<Guid?> RemoveConnectionAsync(string connectionId, CancellationToken cancellationToken);
 

@@ -112,7 +112,7 @@ public sealed class RoomService(
         return await ToRoomStateAsync(participant.RoomId, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<RoomStateDTO?> RevealAsync(string connectionId, CancellationToken cancellationToken)
+    public async Task<RoomStateDTO?> RevealVotes(string connectionId, CancellationToken cancellationToken)
     {
         var participant = await _participantRepository.Participants
             .Include(p => p.Room)
@@ -127,7 +127,7 @@ public sealed class RoomService(
         return await ToRoomStateAsync(participant.RoomId, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<RoomStateDTO?> ResetRoundAsync(string connectionId, CancellationToken cancellationToken)
+    public async Task<RoomStateDTO?> ResetRound(string connectionId, CancellationToken cancellationToken)
     {
         var participant = await _participantRepository.Participants
             .Include(p => p.Room)
