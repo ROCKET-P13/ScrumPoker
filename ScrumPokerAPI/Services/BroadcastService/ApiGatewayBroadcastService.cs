@@ -16,7 +16,7 @@ public sealed class ApiGatewayBroadcastService : IBroadcastService
     public async Task BroadcastRoomStateAsync(
         APIGatewayProxyRequest request,
         IReadOnlyList<string> connectionIds,
-        RoomStateDto state,
+        RoomStateDTO state,
         CancellationToken cancellationToken)
     {
         var endpoint = BuildEndpoint(request);

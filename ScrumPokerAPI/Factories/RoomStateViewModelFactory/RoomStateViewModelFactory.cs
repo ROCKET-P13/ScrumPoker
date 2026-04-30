@@ -6,13 +6,13 @@ namespace ScrumPokerAPI.Factories.RoomStateViewModelFactory;
 
 public sealed class RoomStateViewModelFactory : IRoomStateViewModelFactory
 {
-    public RoomStateDto FromEntities(Room room, IReadOnlyList<Participant> participants)
+    public RoomStateDTO FromEntities(Room room, IReadOnlyList<Participant> participants)
     {
-        return new RoomStateDto
+        return new RoomStateDTO
         {
             RoomCode = room.Code,
             IsRevealed = room.IsRevealed,
-            Participants = participants.Select(participant => new ParticipantStateDto
+            Participants = participants.Select(participant => new ParticipantStateDTO
             {
                 DisplayName = participant.DisplayName,
                 HasVoted = !string.IsNullOrEmpty(participant.Vote),

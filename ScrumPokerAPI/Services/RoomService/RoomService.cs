@@ -19,7 +19,7 @@ public sealed class RoomService(
     private readonly IParticipantFactory _participantFactory = participantFactory;
     private readonly IRoomStateViewModelFactory _roomStateViewModelFactory = roomStateViewModelFactory;
 
-    public async Task<RoomStateDto> CreateRoomAsync(string connectionId, CreateRoomRequestDto dto, CancellationToken cancellationToken)
+    public async Task<RoomStateDTO> CreateRoomAsync(string connectionId, CreateRoomRequestDto dto, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(dto);
 
@@ -30,7 +30,7 @@ public sealed class RoomService(
         return await ToRoomStateAsync(room.Id, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<RoomStateDto?> JoinRoomAsync(string connectionId, JoinRoomRequestDto dto, CancellationToken cancellationToken)
+    public async Task<RoomStateDTO?> JoinRoomAsync(string connectionId, JoinRoomRequestDto dto, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(dto);
 
@@ -52,7 +52,7 @@ public sealed class RoomService(
         return await ToRoomStateAsync(room.Id, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<RoomStateDto?> VoteAsync(string connectionId, VoteRequestDto dto, CancellationToken cancellationToken)
+    public async Task<RoomStateDTO?> VoteAsync(string connectionId, VoteRequestDto dto, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(dto);
 
@@ -66,7 +66,7 @@ public sealed class RoomService(
         return await ToRoomStateAsync(participant.RoomId, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<RoomStateDto?> RevealAsync(string connectionId, CancellationToken cancellationToken)
+    public async Task<RoomStateDTO?> RevealAsync(string connectionId, CancellationToken cancellationToken)
     {
         var participant = await _roomRepository.FindParticipantWithRoomForRevealAsync(connectionId, cancellationToken).ConfigureAwait(false);
         if (participant == null)
@@ -78,7 +78,7 @@ public sealed class RoomService(
         return await ToRoomStateAsync(participant.RoomId, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<RoomStateDto?> ResetRoundAsync(string connectionId, CancellationToken cancellationToken)
+    public async Task<RoomStateDTO?> ResetRoundAsync(string connectionId, CancellationToken cancellationToken)
     {
         var participant = await _roomRepository.FindParticipantWithRoomAggregateAsync(connectionId, cancellationToken).ConfigureAwait(false);
         if (participant == null)
@@ -118,7 +118,7 @@ public sealed class RoomService(
         return _roomRepository.GetConnectionIdsForRoomAsync(roomId, cancellationToken);
     }
 
-    public async Task<RoomStateDto?> GetStateForConnectionAsync(string connectionId, CancellationToken cancellationToken)
+    public async Task<RoomStateDTO?> GetStateForConnectionAsync(string connectionId, CancellationToken cancellationToken)
     {
         var participant = await _roomRepository.FindParticipantReadOnlyAsync(connectionId, cancellationToken).ConfigureAwait(false);
         if (participant == null)
@@ -133,7 +133,7 @@ public sealed class RoomService(
         return participant?.RoomId;
     }
 
-    public async Task<RoomStateDto?> GetRoomStateAsync(Guid roomId, CancellationToken cancellationToken)
+    public async Task<RoomStateDTO?> GetRoomStateAsync(Guid roomId, CancellationToken cancellationToken)
     {
         var room = await _roomRepository.GetRoomReadOnlyAsync(roomId, cancellationToken).ConfigureAwait(false);
         if (room == null)
@@ -143,7 +143,7 @@ public sealed class RoomService(
         return _roomStateViewModelFactory.FromEntities(room, participants);
     }
 
-    private async Task<RoomStateDto> ToRoomStateAsync(Guid roomId, CancellationToken cancellationToken)
+    private async Task<RoomStateDTO> ToRoomStateAsync(Guid roomId, CancellationToken cancellationToken)
     {
         var room = await _roomRepository.GetRoomReadOnlyAsync(roomId, cancellationToken).ConfigureAwait(false);
         if (room == null)
