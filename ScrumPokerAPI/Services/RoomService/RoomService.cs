@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using ScrumPokerAPI.Factories.ParticipantFactory.DTOs;
 using ScrumPokerAPI.Factories.ParticipantFactory.Interfaces;
 using ScrumPokerAPI.Factories.RoomFactory.Interfaces;
@@ -66,20 +65,27 @@ public sealed class RoomService(
         if (room == null)
             return null;
 
-        var existingConnection = await _participantRepository.Participants
-            .FirstOrDefaultAsync(participant => participant.ConnectionId == connectionId, cancellationToken)
+        var existingConnection = await _participantFinder.FindByConnectionId(connectionId, cancellationToken)
             .ConfigureAwait(false);
 
         if (existingConnection != null)
         {
             if (existingConnection.RoomId == room.Id)
             {
-                existingConnection.UpdateDisplayName(dto.DisplayName);
+                var participant = room.Participants.FirstOrDefault(p => p.ConnectionId == connectionId);
+                if (participant == null)
+                    return null;
+
+                participant.UpdateDisplayName(dto.DisplayName);
                 await _unitOfWork.SaveChanges(cancellationToken).ConfigureAwait(false);
                 return await ToRoomStateAsync(room.Id, cancellationToken).ConfigureAwait(false);
             }
 
-            _participantRepository.Remove(existingConnection);
+            var oldRoom = await _roomRepository.FindById(existingConnection.RoomId, cancellationToken)
+                .ConfigureAwait(false);
+            var toRemove = oldRoom?.Participants.FirstOrDefault(p => p.ConnectionId == connectionId);
+            if (toRemove != null)
+                _participantRepository.Remove(toRemove);
         }
 
         var newParticipant = _participantFactory.FromDto(
@@ -100,10 +106,16 @@ public sealed class RoomService(
     {
         ArgumentNullException.ThrowIfNull(dto);
 
-        var participant = await _participantRepository.Participants
-            .FirstOrDefaultAsync(p => p.ConnectionId == connectionId, cancellationToken)
+        var lookup = await _participantFinder.FindByConnectionId(connectionId, cancellationToken)
             .ConfigureAwait(false);
+        if (lookup == null)
+            return null;
 
+        var room = await _roomRepository.FindById(lookup.RoomId, cancellationToken).ConfigureAwait(false);
+        if (room == null)
+            return null;
+
+        var participant = room.Participants.FirstOrDefault(p => p.ConnectionId == connectionId);
         if (participant == null)
             return null;
 
@@ -115,41 +127,50 @@ public sealed class RoomService(
 
     public async Task<RoomStateViewModel?> RevealVotes(string connectionId, CancellationToken cancellationToken)
     {
-        var participant = await _participantRepository.Participants
-            .Include(p => p.Room)
-            .FirstOrDefaultAsync(p => p.ConnectionId == connectionId, cancellationToken)
+        var lookup = await _participantFinder.FindByConnectionId(connectionId, cancellationToken)
             .ConfigureAwait(false);
-        if (participant == null)
+        if (lookup == null)
             return null;
 
-        participant.Room.RevealVotes();
+        var room = await _roomRepository.FindById(lookup.RoomId, cancellationToken).ConfigureAwait(false);
+        if (room == null)
+            return null;
+
+        room.RevealVotes();
         await _unitOfWork.SaveChanges(cancellationToken).ConfigureAwait(false);
 
-        return await ToRoomStateAsync(participant.RoomId, cancellationToken).ConfigureAwait(false);
+        return await ToRoomStateAsync(lookup.RoomId, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<RoomStateViewModel?> ResetRound(string connectionId, CancellationToken cancellationToken)
     {
-        var participant = await _participantRepository.Participants
-            .Include(p => p.Room)
-                .ThenInclude(room => room.Participants)
-            .FirstOrDefaultAsync(p => p.ConnectionId == connectionId, cancellationToken)
+        var lookup = await _participantFinder.FindByConnectionId(connectionId, cancellationToken)
             .ConfigureAwait(false);
-        if (participant == null)
+        if (lookup == null)
             return null;
 
-        var roomId = participant.RoomId;
-        participant.Room.ResetRound();
+        var room = await _roomRepository.FindById(lookup.RoomId, cancellationToken).ConfigureAwait(false);
+        if (room == null)
+            return null;
+
+        room.ResetRound();
         await _unitOfWork.SaveChanges(cancellationToken).ConfigureAwait(false);
 
-        return await ToRoomStateAsync(roomId, cancellationToken).ConfigureAwait(false);
+        return await ToRoomStateAsync(lookup.RoomId, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<Guid?> RemoveConnection(string connectionId, CancellationToken cancellationToken)
     {
-        var participant = await _participantRepository.Participants
-            .FirstOrDefaultAsync(p => p.ConnectionId == connectionId, cancellationToken)
+        var lookup = await _participantFinder.FindByConnectionId(connectionId, cancellationToken)
             .ConfigureAwait(false);
+        if (lookup == null)
+            return null;
+
+        var room = await _roomRepository.FindById(lookup.RoomId, cancellationToken).ConfigureAwait(false);
+        if (room == null)
+            return null;
+
+        var participant = room.Participants.FirstOrDefault(p => p.ConnectionId == connectionId);
         if (participant == null)
             return null;
 
