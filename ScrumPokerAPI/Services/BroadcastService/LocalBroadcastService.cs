@@ -11,7 +11,7 @@ namespace ScrumPokerAPI.Services.BroadcastService;
 public sealed class LocalBroadcastService(ILocalWebSocketHub webSocketHub) : IBroadcastService
 {
 	private readonly ILocalWebSocketHub _webSocketHub =  webSocketHub;
-    public async Task BroadcastRoomStateAsync(
+    public async Task BroadcastRoomState(
         APIGatewayProxyRequest request,
         IReadOnlyList<string> connectionIds,
         RoomStateDTO state,

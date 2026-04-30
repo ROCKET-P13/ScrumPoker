@@ -5,7 +5,7 @@ namespace ScrumPokerAPI.Services.BroadcastService.Interfaces;
 
 public interface IBroadcastService
 {
-    Task BroadcastRoomStateAsync(
+    Task BroadcastRoomState(
         APIGatewayProxyRequest request,
         IReadOnlyList<string> connectionIds,
         RoomStateDTO state,
