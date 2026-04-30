@@ -1,6 +1,6 @@
 using System.Linq;
 using ScrumPokerAPI.Data;
-using ScrumPokerAPI.Domain.Entities;
+using ScrumPokerAPI.Entities;
 using ScrumPokerAPI.Repositories.ParticipantRepository.Interfaces;
 
 namespace ScrumPokerAPI.Repositories.ParticipantRepository;

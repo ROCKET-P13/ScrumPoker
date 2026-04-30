@@ -1,5 +1,5 @@
 using System.Linq;
-using ScrumPokerAPI.Domain.Entities;
+using ScrumPokerAPI.Entities;
 
 namespace ScrumPokerAPI.Repositories.ParticipantRepository.Interfaces;
 

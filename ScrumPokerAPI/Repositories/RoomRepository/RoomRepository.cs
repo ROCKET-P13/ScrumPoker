@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ScrumPokerAPI.Data;
-using ScrumPokerAPI.Domain.Entities;
+using ScrumPokerAPI.Entities;
 using ScrumPokerAPI.Repositories.RoomRepository.Interfaces;
 
 namespace ScrumPokerAPI.Repositories.RoomRepository;

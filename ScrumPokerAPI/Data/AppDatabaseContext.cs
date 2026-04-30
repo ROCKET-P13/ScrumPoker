@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ScrumPokerAPI.Domain.Entities;
+using ScrumPokerAPI.Entities;
 
 namespace ScrumPokerAPI.Data;
 

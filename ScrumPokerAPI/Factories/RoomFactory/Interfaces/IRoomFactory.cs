@@ -1,4 +1,4 @@
-using ScrumPokerAPI.Domain.Entities;
+using ScrumPokerAPI.Entities;
 using ScrumPokerAPI.Models.Requests;
 
 namespace ScrumPokerAPI.Factories.RoomFactory.Interfaces;

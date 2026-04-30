@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ScrumPokerAPI.Domain.Entities;
+using ScrumPokerAPI.Entities;
 using ScrumPokerAPI.Factories.ParticipantFactory.DTOs;
 using ScrumPokerAPI.Factories.ParticipantFactory.Interfaces;
 using ScrumPokerAPI.Factories.RoomFactory.Interfaces;

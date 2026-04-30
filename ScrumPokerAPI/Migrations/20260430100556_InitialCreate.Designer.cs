@@ -25,7 +25,7 @@ namespace ScrumPokerAPI.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ScrumPokerAPI.Domain.Entities.Participant", b =>
+            modelBuilder.Entity("ScrumPokerAPI.Entities.Participant", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -63,7 +63,7 @@ namespace ScrumPokerAPI.Migrations
                     b.ToTable("Participants", (string)null);
                 });
 
-            modelBuilder.Entity("ScrumPokerAPI.Domain.Entities.Room", b =>
+            modelBuilder.Entity("ScrumPokerAPI.Entities.Room", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -92,9 +92,9 @@ namespace ScrumPokerAPI.Migrations
                     b.ToTable("Rooms", (string)null);
                 });
 
-            modelBuilder.Entity("ScrumPokerAPI.Domain.Entities.Participant", b =>
+            modelBuilder.Entity("ScrumPokerAPI.Entities.Participant", b =>
                 {
-                    b.HasOne("ScrumPokerAPI.Domain.Entities.Room", "Room")
+                    b.HasOne("ScrumPokerAPI.Entities.Room", "Room")
                         .WithMany("Participants")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -103,7 +103,7 @@ namespace ScrumPokerAPI.Migrations
                     b.Navigation("Room");
                 });
 
-            modelBuilder.Entity("ScrumPokerAPI.Domain.Entities.Room", b =>
+            modelBuilder.Entity("ScrumPokerAPI.Entities.Room", b =>
                 {
                     b.Navigation("Participants");
                 });

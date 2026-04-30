@@ -1,4 +1,4 @@
-using ScrumPokerAPI.Domain.Entities;
+using ScrumPokerAPI.Entities;
 
 namespace ScrumPokerAPI.Finders.ParticipantFinder.Interfaces;
 

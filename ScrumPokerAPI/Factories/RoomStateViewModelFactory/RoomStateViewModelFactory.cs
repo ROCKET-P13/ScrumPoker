@@ -1,4 +1,4 @@
-using ScrumPokerAPI.Domain.Entities;
+using ScrumPokerAPI.Entities;
 using ScrumPokerAPI.Factories.RoomStateViewModelFactory.Interfaces;
 using ScrumPokerAPI.Models;
 

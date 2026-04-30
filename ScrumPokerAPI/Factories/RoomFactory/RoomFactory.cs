@@ -1,4 +1,4 @@
-using ScrumPokerAPI.Domain.Entities;
+using ScrumPokerAPI.Entities;
 using ScrumPokerAPI.Factories.RoomCodeAllocator.Interfaces;
 using ScrumPokerAPI.Factories.RoomFactory.Interfaces;
 using ScrumPokerAPI.Models.Requests;

@@ -1,4 +1,4 @@
-namespace ScrumPokerAPI.Domain.Entities;
+namespace ScrumPokerAPI.Entities;
 
 public class Participant
 {
