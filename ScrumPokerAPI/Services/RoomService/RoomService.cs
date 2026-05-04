@@ -207,7 +207,6 @@ public sealed class RoomService(
 
 	public async Task CleanupRooms(CancellationToken cancellationToken)
 	{
-		// var now = DateTime.UtcNow;
 
 		var staleRooms = await _roomRepository.FindStale(cancellationToken).ConfigureAwait(false);
 		foreach( var room in staleRooms)
@@ -216,6 +215,5 @@ public sealed class RoomService(
 		}
 
 		await _unitOfWork.SaveChanges(cancellationToken).ConfigureAwait(false);
-		// for	
 	}
 }
