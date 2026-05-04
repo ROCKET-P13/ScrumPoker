@@ -27,6 +27,13 @@ public sealed class RoomRepository(AppDatabaseContext databaseContext) : IRoomRe
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+	public Task<List<Room>> FindStale(CancellationToken cancellationToken)
+	{
+		return _databaseContext.Rooms
+			.Where(room => room.EmptySince != null && (DateTime.UtcNow - room.EmptySince.Value).TotalSeconds > 60)
+			.ToListAsync(cancellationToken);
+	}
+
     public void Upsert(Room room)
     {
         ArgumentNullException.ThrowIfNull(room);

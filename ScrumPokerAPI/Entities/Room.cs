@@ -9,12 +9,18 @@ public class Room
     public bool IsRevealed { get; private set; } = false;
 
     public DateTimeOffset CreatedAt { get; set; }
+    public DateTime? EmptySince { get; private set; }
 
     public ICollection<Participant> Participants { get; private set; } = new List<Participant>();
 
     public Participant AddParticipant(Participant participant)
     {
         Participants.Add(participant);
+		if (EmptySince != null)
+		{
+			EmptySince = null;
+		}
+		
         return participant;
     }
 
@@ -25,6 +31,11 @@ public class Room
             throw new InvalidOperationException("Participant does not belong to this room.");
         if (!Participants.Remove(participant))
             throw new InvalidOperationException("Participant is not a member of this room.");
+
+		if (Participants.Count <= 0)
+		{
+			EmptySince = DateTime.UtcNow;
+		}
     }
 
     public void RevealVotes()

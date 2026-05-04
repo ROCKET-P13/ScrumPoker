@@ -22,7 +22,6 @@ public sealed class RoomFactory(IRoomCodeAllocator roomCodeAllocator) : IRoomFac
             CreatedAt = DateTimeOffset.UtcNow,
 		};
 
-        // room.AddParticipant(Guid.NewGuid(), connectionId, dto.DisplayName.Trim());
         return room;
     }
 }

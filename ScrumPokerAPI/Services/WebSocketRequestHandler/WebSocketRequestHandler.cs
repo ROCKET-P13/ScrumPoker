@@ -46,9 +46,9 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 			if (targets.Count == 0)
 				return EmptySuccessResponse();
 
-			var state = await _roomService.GetRoomState(roomId.Value, CancellationToken.None).ConfigureAwait(false);
-			if (state != null)
-				await _broadcastService.BroadcastRoomState(request, targets, state, CancellationToken.None).ConfigureAwait(false);
+			var roomState = await _roomService.GetRoomState(roomId.Value, CancellationToken.None).ConfigureAwait(false);
+			if (roomState != null)
+				await _broadcastService.BroadcastRoomState(request, targets, roomState, CancellationToken.None).ConfigureAwait(false);
 
 			return EmptySuccessResponse();
 		}
@@ -156,20 +156,32 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 		}
 		catch (JsonException)
 		{
-			await SendResponseEnvelopeAsync(request, connectionId, requestId, false, new { message = "Invalid payload." }, cancellationToken)
-				.ConfigureAwait(false);
+			await SendResponseEnvelopeAsync(
+				request,
+				connectionId,
+				requestId,
+				false,
+				new { message = "Invalid payload." },
+				cancellationToken
+			).ConfigureAwait(false);
 			return EmptySuccessResponse();
 		}
 
 		var trimmedDisplayName = payload?.DisplayName?.Trim() ?? string.Empty;
 		if (trimmedDisplayName.Length == 0)
 		{
-			await SendResponseEnvelopeAsync(request, connectionId, requestId, false, new { message = "displayName is required." }, cancellationToken)
-				.ConfigureAwait(false);
+			await SendResponseEnvelopeAsync(
+				request,
+				connectionId,
+				requestId,
+				false,
+				new { message = "displayName is required." },
+				cancellationToken
+			).ConfigureAwait(false);
 			return EmptySuccessResponse();
 		}
 
-		var state = await _roomService.CreateRoomAsync(
+		var roomState = await _roomService.CreateRoomAsync(
 				connectionId,
 				new CreateRoomRequestDTO { DisplayName = trimmedDisplayName },
 				cancellationToken)
@@ -178,16 +190,28 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 		var roomId = await _roomService.GetRoomIdForConnection(connectionId, cancellationToken).ConfigureAwait(false);
 		if (roomId == null)
 		{
-			await SendResponseEnvelopeAsync(request, connectionId, requestId, false, new { message = "Could not resolve room after create." }, cancellationToken)
-				.ConfigureAwait(false);
+			await SendResponseEnvelopeAsync(
+				request,
+				connectionId,
+				requestId,
+				false,
+				new { message = "Could not resolve room after create." },
+				cancellationToken
+			).ConfigureAwait(false);
 			return EmptySuccessResponse();
 		}
 
 		var targets = await _roomService.GetConnectionIdsForRoom(roomId.Value, cancellationToken).ConfigureAwait(false);
 
-		await SendResponseEnvelopeAsync(request, connectionId, requestId, true, new { }, cancellationToken).ConfigureAwait(false);
-		await _broadcastService.BroadcastRoomState(request, targets, state, cancellationToken).ConfigureAwait(false);
-
+		await SendResponseEnvelopeAsync(
+			request,
+			connectionId,
+			requestId,
+			true,
+			roomState,
+			cancellationToken
+		).ConfigureAwait(false);
+		await _broadcastService.BroadcastRoomState(request, targets, roomState, cancellationToken).ConfigureAwait(false);
 		return EmptySuccessResponse();
 	}
 
@@ -227,7 +251,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 			return EmptySuccessResponse();
 		}
 
-		var state = await _roomService.JoinRoom(
+		var roomState = await _roomService.JoinRoom(
 				connectionId,
 				new JoinRoomRequestDTO
 				{
@@ -237,7 +261,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 				cancellationToken)
 			.ConfigureAwait(false);
 
-		if (state == null)
+		if (roomState == null)
 		{
 			await SendResponseEnvelopeAsync(request, connectionId, requestId, false, new { message = "Room not found." }, cancellationToken)
 				.ConfigureAwait(false);
@@ -251,7 +275,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 		var targets = await _roomService.GetConnectionIdsForRoom(roomId.Value, cancellationToken).ConfigureAwait(false);
 
 		await SendResponseEnvelopeAsync(request, connectionId, requestId, true, new { }, cancellationToken).ConfigureAwait(false);
-		await _broadcastService.BroadcastRoomState(request, targets, state, cancellationToken).ConfigureAwait(false);
+		await _broadcastService.BroadcastRoomState(request, targets, roomState, cancellationToken).ConfigureAwait(false);
 
 		return EmptySuccessResponse();
 	}
@@ -286,13 +310,13 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 			return EmptySuccessResponse();
 		}
 
-		var state = await _roomService.CaptureVote(
+		var roomState = await _roomService.CaptureVote(
 				connectionId,
 				new VoteRequestDTO { Value = trimmedVoteValue },
 				cancellationToken)
 			.ConfigureAwait(false);
 
-		if (state == null)
+		if (roomState == null)
 		{
 			await SendResponseEnvelopeAsync(request, connectionId, requestId, false, new { message = "Not in a room." }, cancellationToken)
 				.ConfigureAwait(false);
@@ -306,7 +330,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 		var targets = await _roomService.GetConnectionIdsForRoom(roomId.Value, cancellationToken).ConfigureAwait(false);
 
 		await SendResponseEnvelopeAsync(request, connectionId, requestId, true, new { }, cancellationToken).ConfigureAwait(false);
-		await _broadcastService.BroadcastRoomState(request, targets, state, cancellationToken).ConfigureAwait(false);
+		await _broadcastService.BroadcastRoomState(request, targets, roomState, cancellationToken).ConfigureAwait(false);
 
 		return EmptySuccessResponse();
 	}
@@ -317,8 +341,8 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 		string? requestId,
 		CancellationToken cancellationToken)
 	{
-		var state = await _roomService.RevealVotes(connectionId, cancellationToken).ConfigureAwait(false);
-		if (state == null)
+		var roomState = await _roomService.RevealVotes(connectionId, cancellationToken).ConfigureAwait(false);
+		if (roomState == null)
 		{
 			await SendResponseEnvelopeAsync(request, connectionId, requestId, false, new { message = "Not in a room." }, cancellationToken)
 				.ConfigureAwait(false);
@@ -332,7 +356,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 		var targets = await _roomService.GetConnectionIdsForRoom(roomId.Value, cancellationToken).ConfigureAwait(false);
 
 		await SendResponseEnvelopeAsync(request, connectionId, requestId, true, new { }, cancellationToken).ConfigureAwait(false);
-		await _broadcastService.BroadcastRoomState(request, targets, state, cancellationToken).ConfigureAwait(false);
+		await _broadcastService.BroadcastRoomState(request, targets, roomState, cancellationToken).ConfigureAwait(false);
 
 		return EmptySuccessResponse();
 	}
@@ -343,8 +367,8 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 		string? requestId,
 		CancellationToken cancellationToken)
 	{
-		var state = await _roomService.ResetRound(connectionId, cancellationToken).ConfigureAwait(false);
-		if (state == null)
+		var roomState = await _roomService.ResetRound(connectionId, cancellationToken).ConfigureAwait(false);
+		if (roomState == null)
 		{
 			await SendResponseEnvelopeAsync(request, connectionId, requestId, false, new { message = "Not in a room." }, cancellationToken)
 				.ConfigureAwait(false);
@@ -358,7 +382,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 		var targets = await _roomService.GetConnectionIdsForRoom(roomId.Value, cancellationToken).ConfigureAwait(false);
 
 		await SendResponseEnvelopeAsync(request, connectionId, requestId, true, new { }, cancellationToken).ConfigureAwait(false);
-		await _broadcastService.BroadcastRoomState(request, targets, state, cancellationToken).ConfigureAwait(false);
+		await _broadcastService.BroadcastRoomState(request, targets, roomState, cancellationToken).ConfigureAwait(false);
 
 		return EmptySuccessResponse();
 	}

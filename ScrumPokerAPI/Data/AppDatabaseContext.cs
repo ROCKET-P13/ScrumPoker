@@ -17,6 +17,7 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
 			entity.Property(e => e.Code).HasColumnName("code");
 			entity.Property(e => e.IsRevealed).HasColumnName("is_revealed");
 			entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+			entity.Property(e => e.EmptySince).HasColumnName("empty_since");
 
             entity.HasKey(room => room.Id);
             entity.HasIndex(room => room.Code).IsUnique();

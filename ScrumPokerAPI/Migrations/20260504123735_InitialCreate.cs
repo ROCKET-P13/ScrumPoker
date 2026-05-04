@@ -18,7 +18,8 @@ namespace ScrumPokerAPI.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     code = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                     is_revealed = table.Column<bool>(type: "boolean", nullable: false),
-                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    empty_since = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -33,7 +34,7 @@ namespace ScrumPokerAPI.Migrations
                     room_id = table.Column<Guid>(type: "uuid", nullable: false),
                     connection_id = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     display_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    is_room_admin = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    is_room_admin = table.Column<bool>(type: "boolean", nullable: false),
                     vote = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true)
                 },
                 constraints: table =>

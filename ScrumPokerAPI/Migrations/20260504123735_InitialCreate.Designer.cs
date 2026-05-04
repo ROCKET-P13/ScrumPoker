@@ -12,7 +12,7 @@ using ScrumPokerAPI.Data;
 namespace ScrumPokerAPI.Migrations
 {
     [DbContext(typeof(AppDatabaseContext))]
-    [Migration("20260430100556_InitialCreate")]
+    [Migration("20260504123735_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -84,6 +84,10 @@ namespace ScrumPokerAPI.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<DateTime?>("EmptySince")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("empty_since");
+
                     b.Property<bool>("IsRevealed")
                         .HasColumnType("boolean")
                         .HasColumnName("is_revealed");
@@ -98,13 +102,11 @@ namespace ScrumPokerAPI.Migrations
 
             modelBuilder.Entity("ScrumPokerAPI.Entities.Participant", b =>
                 {
-                    b.HasOne("ScrumPokerAPI.Entities.Room", "Room")
+                    b.HasOne("ScrumPokerAPI.Entities.Room", null)
                         .WithMany("Participants")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("ScrumPokerAPI.Entities.Room", b =>

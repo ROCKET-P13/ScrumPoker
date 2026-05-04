@@ -181,11 +181,6 @@ public sealed class RoomService(
         var roomId = participant.RoomId;
         room.RemoveParticipant(participant);
 
-		if (room.Participants.Count <= 0)
-		{
-			_roomRepository.Remove(room);
-		}
-
         await _unitOfWork.SaveChanges(cancellationToken).ConfigureAwait(false);
         return roomId;
     }
@@ -209,4 +204,18 @@ public sealed class RoomService(
 
         return _roomStateViewModelFactory.FromRoom(room);
     }
+
+	public async Task CleanupRooms(CancellationToken cancellationToken)
+	{
+		// var now = DateTime.UtcNow;
+
+		var staleRooms = await _roomRepository.FindStale(cancellationToken).ConfigureAwait(false);
+		foreach( var room in staleRooms)
+		{
+			_roomRepository.Remove(room);
+		}
+
+		await _unitOfWork.SaveChanges(cancellationToken).ConfigureAwait(false);
+		// for	
+	}
 }
