@@ -237,8 +237,21 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 			return EmptySuccessResponse();
 		}
 
-		var normalizedRoomCode = payload?.RoomCode?.Trim() ?? string.Empty;
-		var trimmedDisplayName = payload?.DisplayName?.Trim() ?? string.Empty;
+		if (payload == null)
+		{
+			await SendResponseEnvelopeAsync(
+				request,
+				connectionId,
+				requestId,
+				false,
+				new { message = "Payload is missing." },
+				cancellationToken
+			).ConfigureAwait(false);
+			return EmptySuccessResponse();
+		}
+
+		var normalizedRoomCode = payload.RoomCode?.Trim() ?? string.Empty;
+		var trimmedDisplayName = payload.DisplayName?.Trim() ?? string.Empty;
 		if (normalizedRoomCode.Length == 0 || trimmedDisplayName.Length == 0)
 		{
 			await SendResponseEnvelopeAsync(
@@ -247,7 +260,8 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 				requestId,
 				false,
 				new { message = "roomCode and displayName are required." },
-				cancellationToken).ConfigureAwait(false);
+				cancellationToken
+			).ConfigureAwait(false);
 			return EmptySuccessResponse();
 		}
 
@@ -256,7 +270,8 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 				new JoinRoomRequestDTO
 				{
 					RoomCode = normalizedRoomCode,
-					DisplayName = trimmedDisplayName
+					DisplayName = trimmedDisplayName,
+					IsRoomAdmin = payload.IsRoomAdmin || false
 				},
 				cancellationToken)
 			.ConfigureAwait(false);

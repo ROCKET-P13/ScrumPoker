@@ -15,6 +15,12 @@ public class Room
 
     public Participant AddParticipant(Participant participant)
     {
+		var roomAdmin = Participants.FirstOrDefault(p => p.IsRoomAdmin);
+		if (roomAdmin != null && participant.IsRoomAdmin)
+		{
+			throw new InvalidOperationException("Room already has administrator");
+		}
+
         Participants.Add(participant);
 		if (EmptySince != null)
 		{

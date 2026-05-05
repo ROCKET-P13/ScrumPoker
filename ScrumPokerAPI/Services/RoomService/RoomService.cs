@@ -95,6 +95,7 @@ public sealed class RoomService(
                 ConnectionId = connectionId,
                 DisplayName = dto.DisplayName,
                 RoomId = room.Id,
+				IsRoomAdmin = dto.IsRoomAdmin
             }
 		);
 
