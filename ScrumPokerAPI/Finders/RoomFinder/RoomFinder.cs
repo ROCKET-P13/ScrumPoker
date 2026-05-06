@@ -18,13 +18,13 @@ public sealed class RoomFinder(AppDatabaseContext databaseContext) : IRoomFinder
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public Task<Room?> FindByCode(string normalizedRoomCode, CancellationToken cancellationToken)
+    public Task<Room?> FindByCode(string roomCode, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(normalizedRoomCode);
+        ArgumentNullException.ThrowIfNull(roomCode);
 
         return _databaseContext.Rooms
             .AsNoTracking()
-            .Where(room => room.Code == normalizedRoomCode)
+            .Where(room => room.Code == roomCode)
             .FirstOrDefaultAsync(cancellationToken);
     }
 

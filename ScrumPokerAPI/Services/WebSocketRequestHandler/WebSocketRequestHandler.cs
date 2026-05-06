@@ -167,8 +167,8 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 			return EmptySuccessResponse();
 		}
 
-		var trimmedDisplayName = payload?.DisplayName?.Trim() ?? string.Empty;
-		if (trimmedDisplayName.Length == 0)
+		var displayName = payload?.DisplayName?.Trim() ?? string.Empty;
+		if (displayName.Length == 0)
 		{
 			await SendResponseEnvelopeAsync(
 				request,
@@ -183,7 +183,7 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 
 		var roomState = await _roomService.CreateRoomAsync(
 				connectionId,
-				new CreateRoomRequestDTO { DisplayName = trimmedDisplayName },
+				new CreateRoomRequestDTO { DisplayName = displayName },
 				cancellationToken)
 			.ConfigureAwait(false);
 
@@ -250,9 +250,9 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 			return EmptySuccessResponse();
 		}
 
-		var normalizedRoomCode = payload.RoomCode?.Trim() ?? string.Empty;
-		var trimmedDisplayName = payload.DisplayName?.Trim() ?? string.Empty;
-		if (normalizedRoomCode.Length == 0 || trimmedDisplayName.Length == 0)
+		var roomCode = payload.RoomCode?.Trim() ?? string.Empty;
+		var displayName = payload.DisplayName?.Trim() ?? string.Empty;
+		if (roomCode.Length == 0 || displayName.Length == 0)
 		{
 			await SendResponseEnvelopeAsync(
 				request,
@@ -269,8 +269,8 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 				connectionId,
 				new JoinRoomRequestDTO
 				{
-					RoomCode = normalizedRoomCode,
-					DisplayName = trimmedDisplayName,
+					RoomCode = roomCode,
+					DisplayName = displayName,
 					IsRoomAdmin = payload.IsRoomAdmin || false
 				},
 				cancellationToken)
@@ -317,17 +317,9 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 			return EmptySuccessResponse();
 		}
 
-		var trimmedVoteValue = payload?.Value?.Trim() ?? string.Empty;
-		if (trimmedVoteValue.Length == 0)
-		{
-			await SendResponseEnvelopeAsync(request, connectionId, requestId, false, new { message = "value is required." }, cancellationToken)
-				.ConfigureAwait(false);
-			return EmptySuccessResponse();
-		}
-
 		var roomState = await _roomService.CaptureVote(
 				connectionId,
-				new VoteRequestDTO { Value = trimmedVoteValue },
+				new VoteRequestDTO { Value = payload?.Value ?? string.Empty },
 				cancellationToken)
 			.ConfigureAwait(false);
 
