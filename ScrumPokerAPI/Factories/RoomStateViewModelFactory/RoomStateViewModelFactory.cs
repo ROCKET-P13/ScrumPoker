@@ -13,7 +13,10 @@ public sealed class RoomStateViewModelFactory : IRoomStateViewModelFactory
             RoomCode = room.Code,
             IsRevealed = room.IsRevealed,
             Participants = [
-				.. room.Participants.Select(participant => new ParticipantViewModel
+				.. room.Participants
+				.OrderByDescending(p => p.IsRoomAdmin)
+				.ThenBy(p => p.DisplayName)
+				.Select(participant => new ParticipantViewModel
 				{
 					DisplayName = participant.DisplayName,
 					IsRoomAdmin = participant.IsRoomAdmin,
