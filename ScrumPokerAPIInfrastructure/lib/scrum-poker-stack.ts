@@ -36,7 +36,7 @@ export class ScrumPokerStack extends cdk.Stack {
 		dbSecurityGroup.addIngressRule(lambdaSecurityGroup, ec2.Port.tcp(5432), 'Allow Lambda to reach Postgres');
 
 		const databaseSecret = new secretsmanager.Secret(this, 'DatabaseSecret', {
-			secretName: 'ScrumPokerAPI_Secret',
+			secretName: 'ScrumPokerAPI_DatabaseSecret',
 			description: 'PostgreSQL connection string for Scrum Poker API (plain text Npgsql format)',
 			generateSecretString: {
 				secretStringTemplate: JSON.stringify({ username: 'scrumpokerapi' }),
@@ -74,7 +74,7 @@ export class ScrumPokerStack extends cdk.Stack {
 			securityGroups: [lambdaSecurityGroup],
 			vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
 			environment: {
-				POSTGRES_SECRET_ARN: databaseSecret.secretArn,
+				DATABASE_SECRET_ARN: databaseSecret.secretArn,
 				DB_HOST: dbInstance.dbInstanceEndpointAddress,
 				DB_PORT: dbInstance.dbInstanceEndpointPort,
 				DB_NAME: 'scrumpoker',
@@ -93,9 +93,10 @@ export class ScrumPokerStack extends cdk.Stack {
 			disconnectRouteOptions: {
 				integration: new apigwv2Integrations.WebSocketLambdaIntegration('Disconnect', handler),
 			},
-			// defaultRouteOptions: {
-			// 	integration: new apigwv2Integrations.WebSocketLambdaIntegration('Default', handler),
-			// },
+			defaultRouteOptions: {
+				// Do not use id "Default" here: it collides with the $default route logical id during synth.
+				integration: new apigwv2Integrations.WebSocketLambdaIntegration('MessageHandler', handler),
+			},
 		});
 
 		const stage = new apigwv2.WebSocketStage(this, 'ProdStage', {
@@ -109,7 +110,9 @@ export class ScrumPokerStack extends cdk.Stack {
 		this.webSocketUrl = stage.url;
 
 		new cdk.CfnOutput(this, 'WebSocketUrl', {
-			description: 'Connect your frontend with wss (use this URL in the browser)',
+			description:
+				'Browser WebSocket endpoint (wss://.../prod). Use with new WebSocket(url). '
+				+ 'Do not use the HTTPS Callback URL from the console; that is for PostToConnection only.',
 			value: stage.url,
 		});
 

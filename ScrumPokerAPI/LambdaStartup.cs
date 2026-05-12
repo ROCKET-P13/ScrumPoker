@@ -65,6 +65,13 @@ public static class LambdaStartup
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection, connectionString);
             _serviceProvider = serviceCollection.BuildServiceProvider();
+
+            await using (var migrateScope = _serviceProvider.CreateAsyncScope())
+            {
+                var db = migrateScope.ServiceProvider.GetRequiredService<AppDatabaseContext>();
+                await db.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
+            }
+
             return _serviceProvider;
         }
         finally

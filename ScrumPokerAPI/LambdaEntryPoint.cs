@@ -8,11 +8,13 @@ namespace ScrumPokerAPI;
 
 public class LambdaEntryPoint
 {
-    public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext lambdaContext, CancellationToken cancellationToken = default)
-    {
-        var serviceProvider = await LambdaStartup.GetOrCreateServiceProviderAsync(cancellationToken).ConfigureAwait(false);
-        await using var scope = serviceProvider.CreateAsyncScope();
-        var webSocketRequestHandler = scope.ServiceProvider.GetRequiredService<WebSocketRequestHandler>();
-        return await webSocketRequestHandler.ProcessRequest(request, cancellationToken).ConfigureAwait(false);
-    }
+	public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
+	{
+		using var cts = new CancellationTokenSource(context.RemainingTime);
+		var cancellationToken = cts.Token;
+		var serviceProvider = await LambdaStartup.GetOrCreateServiceProviderAsync(cancellationToken).ConfigureAwait(false);
+		await using var scope = serviceProvider.CreateAsyncScope();
+		var webSocketRequestHandler = scope.ServiceProvider.GetRequiredService<WebSocketRequestHandler>();
+		return await webSocketRequestHandler.ProcessRequest(request, cancellationToken).ConfigureAwait(false);
+	}
 }
