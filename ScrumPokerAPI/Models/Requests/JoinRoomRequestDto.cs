@@ -6,4 +6,5 @@ public sealed class JoinRoomRequestDTO
 
     public string DisplayName { get; set; } = string.Empty;
 	public bool IsRoomAdmin { get; set; } = false;
+	public bool IsPlayer { get; set; } = false;
 }

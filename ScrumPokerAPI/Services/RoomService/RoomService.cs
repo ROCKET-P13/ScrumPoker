@@ -42,6 +42,7 @@ public sealed class RoomService(
                 DisplayName = dto.DisplayName,
                 RoomId = room.Id,
                 IsRoomAdmin = true,
+				IsPlayer = dto.IsPlayer,
             });
 
         room.AddParticipant(participant);
@@ -95,7 +96,8 @@ public sealed class RoomService(
                 ConnectionId = connectionId,
                 DisplayName = dto.DisplayName,
                 RoomId = room.Id,
-				IsRoomAdmin = dto.IsRoomAdmin
+				IsRoomAdmin = dto.IsRoomAdmin,
+				IsPlayer = dto.IsPlayer
             }
 		);
 

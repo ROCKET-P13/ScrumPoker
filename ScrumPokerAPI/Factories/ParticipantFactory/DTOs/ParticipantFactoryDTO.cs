@@ -7,4 +7,5 @@ public class ParticipantFactoryDTO
 	public Guid RoomId { get; set; }
 
 	public bool IsRoomAdmin { get; set; }
+	public bool IsPlayer { get; set; }
 }

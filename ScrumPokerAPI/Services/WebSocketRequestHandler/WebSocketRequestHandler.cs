@@ -183,7 +183,11 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 
 		var roomState = await _roomService.CreateRoomAsync(
 				connectionId,
-				new CreateRoomRequestDTO { DisplayName = displayName },
+				new CreateRoomRequestDTO
+				{
+					DisplayName = displayName,
+					IsPlayer = payload.IsPlayer
+				},
 				cancellationToken)
 			.ConfigureAwait(false);
 
@@ -271,7 +275,8 @@ public sealed class WebSocketRequestHandler(IRoomService roomService, IBroadcast
 				{
 					RoomCode = roomCode,
 					DisplayName = displayName,
-					IsRoomAdmin = payload.IsRoomAdmin || false
+					IsRoomAdmin = payload.IsRoomAdmin || false,
+					IsPlayer = payload.IsPlayer || false,
 				},
 				cancellationToken)
 			.ConfigureAwait(false);

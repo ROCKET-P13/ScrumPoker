@@ -17,6 +17,7 @@ public sealed class ParticipantFactory : IParticipantFactory
             ConnectionId = dto.ConnectionId,
             DisplayName = dto.DisplayName.Trim(),
             IsRoomAdmin = dto.IsRoomAdmin,
+			IsPlayer = dto.IsPlayer,
         };
     }
 }

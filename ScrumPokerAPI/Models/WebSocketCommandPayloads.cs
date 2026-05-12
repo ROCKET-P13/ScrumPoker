@@ -3,6 +3,7 @@ namespace ScrumPokerAPI.Models;
 public sealed class CreateRoomCommandPayload
 {
 	public string? DisplayName { get; set; }
+	public bool IsPlayer { get; set; } = false;
 }
 
 public sealed class JoinRoomCommandPayload
@@ -11,6 +12,7 @@ public sealed class JoinRoomCommandPayload
 
 	public string? DisplayName { get; set; }
 	public bool IsRoomAdmin { get; set; } = false;
+	public bool IsPlayer { get; set; } = false;
 }
 
 public sealed class SendVoteCommandPayload

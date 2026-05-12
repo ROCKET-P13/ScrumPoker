@@ -22,6 +22,7 @@ public sealed class RoomStateViewModelFactory : IRoomStateViewModelFactory
 					IsRoomAdmin = participant.IsRoomAdmin,
 					HasVoted = !string.IsNullOrEmpty(participant.Vote),
 					Vote = room.IsRevealed ? participant.Vote : null,
+					IsPlayer = participant.IsPlayer,
 				})
 			],
         };
