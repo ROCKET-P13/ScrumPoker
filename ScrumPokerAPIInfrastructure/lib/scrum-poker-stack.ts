@@ -17,6 +17,8 @@ export class ScrumPokerStack extends cdk.Stack {
 
 		const vpc = new ec2.Vpc(this, 'ServerlessVpc', {
 			maxAzs: 2,
+			// Default is one NAT per AZ (~2× NAT hourly + processing). One NAT cuts fixed cost; expect possible cross-AZ data charges.
+			natGateways: 1,
 			subnetConfiguration: [
 				{
 					name: 'Public',
@@ -51,13 +53,16 @@ export class ScrumPokerStack extends cdk.Stack {
 				version: rds.PostgresEngineVersion.VER_17_2,
 			}),
 			vpc,
+			// Default instance class is db.m5.large; burstable Graviton is enough for light Scrum Poker traffic.
+			instanceType: ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.MICRO),
+			storageType: rds.StorageType.GP3,
 			credentials: rds.Credentials.fromSecret(databaseSecret),
 			vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
 			securityGroups: [dbSecurityGroup],
 			allocatedStorage: 20,
-			maxAllocatedStorage: 100,
 			publiclyAccessible: false,
 			databaseName: 'scrumpoker',
+			enablePerformanceInsights: false,
 			removalPolicy: cdk.RemovalPolicy.DESTROY,
 		});
 
