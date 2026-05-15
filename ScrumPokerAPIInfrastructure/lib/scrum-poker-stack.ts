@@ -3,9 +3,7 @@ import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import * as apigwv2 from 'aws-cdk-lib/aws-apigatewayv2';
 import * as apigwv2Integrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
-import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as rds from 'aws-cdk-lib/aws-rds';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
 
@@ -15,55 +13,15 @@ export class ScrumPokerStack extends cdk.Stack {
 	constructor (scope: Construct, id: string, props?: cdk.StackProps) {
 		super(scope, id, props);
 
-		const vpc = new ec2.Vpc(this, 'ServerlessVpc', {
-			maxAzs: 2,
-			// Default is one NAT per AZ (~2× NAT hourly + processing). One NAT cuts fixed cost; expect possible cross-AZ data charges.
-			natGateways: 1,
-			subnetConfiguration: [
-				{
-					name: 'Public',
-					subnetType: ec2.SubnetType.PUBLIC,
-					cidrMask: 24,
-				},
-				{
-					name: 'Private',
-					subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
-					cidrMask: 24,
-				},
-			],
-		});
-
-		const dbSecurityGroup = new ec2.SecurityGroup(this, 'DbSecurityGroup', { vpc, allowAllOutbound: true });
-		const lambdaSecurityGroup = new ec2.SecurityGroup(this, 'LambdaSecurityGroup', { vpc, allowAllOutbound: true });
-		dbSecurityGroup.addIngressRule(lambdaSecurityGroup, ec2.Port.tcp(5432), 'Allow Lambda to reach Postgres');
-
-		const databaseSecret = new secretsmanager.Secret(this, 'DatabaseSecret', {
-			secretName: 'ScrumPokerAPI_DatabaseSecret',
-			description: 'PostgreSQL connection string for Scrum Poker API (plain text Npgsql format)',
-			generateSecretString: {
-				secretStringTemplate: JSON.stringify({ username: 'scrumpokerapi' }),
-				generateStringKey: 'password',
-				excludeCharacters: `;/@": %$><'`,
-				passwordLength: 16,
-			},
-		});
-
-		const dbInstance = new rds.DatabaseInstance(this, 'PostgresDb', {
-			engine: rds.DatabaseInstanceEngine.postgres({
-				version: rds.PostgresEngineVersion.VER_17_2,
-			}),
-			vpc,
-			// Default instance class is db.m5.large; burstable Graviton is enough for light Scrum Poker traffic.
-			instanceType: ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.MICRO),
-			storageType: rds.StorageType.GP3,
-			credentials: rds.Credentials.fromSecret(databaseSecret),
-			vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
-			securityGroups: [dbSecurityGroup],
-			allocatedStorage: 20,
-			publiclyAccessible: false,
-			databaseName: 'scrumpoker',
-			enablePerformanceInsights: false,
-			removalPolicy: cdk.RemovalPolicy.DESTROY,
+		// Plaintext Npgsql connection string (Supabase pooler recommended for Lambda). Replace in Secrets Manager after deploy.
+		const databaseSecret = new secretsmanager.Secret(this, 'SupabaseConnectionSecret', {
+			secretName: 'ScrumPokerAPI_SupabaseConnection',
+			description: 'Npgsql connection string for Supabase Postgres (pooler URI from Supabase dashboard)',
+			removalPolicy: cdk.RemovalPolicy.RETAIN,
+			secretStringValue: cdk.SecretValue.unsafePlainText(
+				'Host=YOUR_PROJECT.pooler.supabase.com;Port=6543;Username=postgres.YOUR_PROJECT_REF;'
+					+ 'Password=YOUR_PASSWORD;Database=postgres;SSL Mode=Require'
+			),
 		});
 
 		const handler = new lambda.Function(this, 'ScrumPokerHandler', {
@@ -73,18 +31,11 @@ export class ScrumPokerStack extends cdk.Stack {
 			code: lambda.Code.fromAsset(
 				path.join(__dirname, '../../ScrumPokerAPI/bin/Release/net8.0/publish')
 			),
-			vpc,
 			timeout: cdk.Duration.seconds(30),
 			memorySize: 512,
-			securityGroups: [lambdaSecurityGroup],
-			vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
 			environment: {
 				DATABASE_SECRET_ARN: databaseSecret.secretArn,
-				DB_HOST: dbInstance.dbInstanceEndpointAddress,
-				DB_PORT: dbInstance.dbInstanceEndpointPort,
-				DB_NAME: 'scrumpoker',
 			},
-
 		});
 
 		databaseSecret.grantRead(handler);
@@ -122,7 +73,9 @@ export class ScrumPokerStack extends cdk.Stack {
 		});
 
 		new cdk.CfnOutput(this, 'DatabaseSecretArn', {
-			description: 'Update this secret in Secrets Manager with your real PostgreSQL connection string',
+			description:
+				'Secrets Manager ARN: set the secret value to your Supabase connection string '
+				+ '(Transaction pooler / Npgsql from Supabase Project Settings → Database).',
 			value: databaseSecret.secretArn,
 		});
 
