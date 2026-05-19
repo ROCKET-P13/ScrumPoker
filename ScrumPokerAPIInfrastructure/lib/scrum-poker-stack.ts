@@ -14,8 +14,8 @@ export class ScrumPokerStack extends cdk.Stack {
 		super(scope, id, props);
 
 		// Plaintext Npgsql connection string (Supabase pooler recommended for Lambda). Replace in Secrets Manager after deploy.
-		const databaseSecret = new secretsmanager.Secret(this, 'SupabaseConnectionSecret', {
-			secretName: 'ScrumPokerAPI_SupabaseConnection',
+		const databaseSecret = new secretsmanager.Secret(this, 'ScrumPokerDatabaseSecret', {
+			secretName: 'ScrumPokerAPI_Supabase',
 			description: 'Npgsql connection string for Supabase Postgres (pooler URI from Supabase dashboard)',
 			removalPolicy: cdk.RemovalPolicy.RETAIN,
 			secretStringValue: cdk.SecretValue.unsafePlainText(

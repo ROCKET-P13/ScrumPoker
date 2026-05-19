@@ -38,8 +38,48 @@ public static class ConnectionStringResolver
 			throw new InvalidOperationException("Secret has no SecretString payload.");
 
 		var secretPayload = response.SecretString.Trim();
-		_cachedConnectionString = TryBuildFromRdsSecretJson(secretPayload) ?? secretPayload;
+		_cachedConnectionString = TryExtractFromAppsettingsJson(secretPayload)
+			?? TryBuildFromRdsSecretJson(secretPayload)
+			?? secretPayload;
 		return _cachedConnectionString;
+	}
+
+	private static string? TryExtractFromAppsettingsJson(string secretPayload)
+	{
+		JsonDocument doc;
+		try
+		{
+			doc = JsonDocument.Parse(secretPayload);
+		}
+		catch (JsonException)
+		{
+			return null;
+		}
+
+		using (doc)
+		{
+			if (doc.RootElement.ValueKind != JsonValueKind.Object)
+				return null;
+
+			foreach (var section in doc.RootElement.EnumerateObject())
+			{
+				if (!string.Equals(section.Name, "ConnectionStrings", StringComparison.OrdinalIgnoreCase))
+					continue;
+				if (section.Value.ValueKind != JsonValueKind.Object)
+					return null;
+				foreach (var entry in section.Value.EnumerateObject())
+				{
+					if (!string.Equals(entry.Name, "DefaultConnection", StringComparison.OrdinalIgnoreCase))
+						continue;
+					if (entry.Value.ValueKind != JsonValueKind.String)
+						return null;
+					var s = entry.Value.GetString();
+					return string.IsNullOrWhiteSpace(s) ? null : s.Trim();
+				}
+			}
+
+			return null;
+		}
 	}
 
 	private static string? TryBuildFromRdsSecretJson(string secretPayload)
